@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <link rel="icon" type="image/png" href="images/beelogo.png"/> 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100..900&display=swap" rel="stylesheet">
-
 </head>
 <body>
 <header>
@@ -17,10 +16,9 @@
         <label for="check" class="open-menu"><i class="fas fa-bars"></i></label>
 
         <ul class="nav-bar">
-            
             <li class="logo">
                 <a href="#" onclick="loadPage('web/TrangChu.html')">
-                    <img src="images/Fptlogonew.png" width="0" height="0" alt="logo">
+                    <img src="images/Fptlogonew.png" width="120" alt="logo">
                 </a>
             </li>
             <li><a id="current-time2" href="#" onclick="loadPage('web/dongho.html')"></a></li>
@@ -33,12 +31,12 @@
                     <li class="dropdown">
                         <a href="#" onclick="loadPage('web/index1.html')">Thông tin</a>
                         <ul class="submenu">
-                            <li><a href="#" onclick="loadPage('#')">Thông tin cá nhân</a></li>
-                            <li><a href="#" onclick="loadPage('#')">Thông tin học tập</a></li>
-                            <li><a href="#" onclick="loadPage('#')">Thông tin tài liệu</a></li>
+                            <li><a href="#">Thông tin cá nhân</a></li>
+                            <li><a href="#">Thông tin học tập</a></li>
+                            <li><a href="#">Thông tin tài liệu</a></li>
                         </ul>
                     </li>
-                    <li><a href="#" onclick="loadPage('')">Tài liệu</a></li>
+                    <li><a href="#">Tài liệu</a></li>
                 </ul>
             </li>
 
@@ -46,8 +44,8 @@
             <li><a href="#" onclick="loadPage('web/Lienhe.html')">Thưởng</a></li>
             <li><a href="#" onclick="loadPage('web/GopY.html')">Dịch vụ</a></li>
             <li><a href="#" onclick="loadPage('web/HoiDap.html')">Học phí</a></li>
-            <li><a href="#" onclick="loadPage('')">Sự kiện</a></li>
-            <li><a href="#" onlick="loadPage('')">Điểm</a></li>
+            <li><a href="#">Sự kiện</a></li>
+            <li><a href="#" onclick="loadPage('')">Điểm</a></li>
 
             <label for="check" class="close-menu"><i class="fas fa-times"></i></label>
         </ul>
@@ -102,7 +100,9 @@
 
 <script>
     function loadPage(page) {
-        document.getElementById("contentFrame").src = page;
+        if (page && page.trim() !== "") {
+            document.getElementById("contentFrame").src = page;
+        }
     }
 
     function updateTime() {
@@ -118,17 +118,6 @@
     setInterval(updateTime, 1000);
     updateTime();
 </script>
-
-<!-- ✅ Đặt đoạn này ngay bên dưới -->
-<script>
-    window.addEventListener('load', () => {
-        if (!sessionStorage.getItem('hasReloaded')) {
-            sessionStorage.setItem('hasReloaded', 'true');
-            location.reload();
-        }
-    });
-</script>
-
 
 </body>
 </html>
