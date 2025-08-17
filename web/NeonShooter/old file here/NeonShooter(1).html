@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Neon Shooter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Game Canvas -->
+  <canvas id="c"></canvas>
+
+  <!-- HUD -->
+  <div id="ui"></div>
+  <div id="hud-players"></div>
+  <div id="credits"></div>
+
+  <!-- Menu Overlay -->
+  <div id="menu">
+    <div class="wrapper">
+      <h1>NEON SHOOTER</h1>
+
+      <!-- Hiển thị tổng Points -->
+      <div id="totalPoints">Points: 0</div>
+
+      <!-- Chọn Skin -->
+      <h4>Skin</h4>
+      <div class="skin-chooser">
+        <div data-skin="0" class="skin-swatch sel"></div>
+        <div data-skin="1" class="skin-swatch"></div>
+        <div data-skin="2" class="skin-swatch"></div>
+      </div>
+
+      <!-- Chọn Map -->
+      <h4>Map</h4>
+      <div class="map-chooser">
+        <div data-map="0" class="map-thumb sel">Map 0</div>
+        <div data-map="1" class="map-thumb">Map 1</div>
+        <div data-map="2" class="map-thumb">Map 2</div>
+      </div>
+
+      <!-- Chế độ chơi -->
+      <h4>Mode</h4>
+      <label><input type="radio" name="mode" value="single" checked> Single</label>
+      <label><input type="radio" name="mode" value="coop"> Co-op</label>
+
+      <!-- Shop -->
+      <div id="shop">
+        <button id="upgradeFireRate">Fire Rate + (500)</button>
+        <button id="upgradeDamage">Bullet Damage + (1000)</button>
+        <button id="unlockMissile">Unlock Missile (2000)</button>
+        <button id="upgradeMissile">Upgrade Missile (1500)</button>
+        <button id="unlockLaser">Unlock Laser (5000)</button>
+        <button id="upgradeLaser">Upgrade Laser (3000)</button>
+      </div>
+
+      <!-- Menu buttons -->
+      <div class="menu-buttons">
+        <button id="startBtn">START GAME</button>
+        <button id="restartBtn">RESTART</button>
+        <button id="tutorialBtn">TUTORIAL</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Over Screen -->
+  <div id="gameOverScreen">
+    <h2>All players are down!</h2>
+    <button id="menuBtn">Menu</button>
+  </div>
+
+  <!-- Thông báo -->
+  <div id="notify"></div>
+
+  <!-- Scripts -->
+  <script src="audio_explosion_advanced.js"></script>
+  <script src="main_neon_fixed_menu_button_full.js"></script>
+  <script>
+    const startBtn = document.getElementById('startBtn');
+    const menuBtn = document.getElementById('menuBtn');
+
+    startBtn.addEventListener('click', async () => {
+      if (window.audio?.unlock) await audio.unlock();
+      document.body.classList.add('playing');
+      document.getElementById('gameOverScreen').style.display = 'none';
+    });
+
+    menuBtn.addEventListener('click', () => {
+      returnToMenu();
+      document.getElementById('gameOverScreen').style.display = 'none';
+    });
+
+    function returnToMenu() {
+      document.body.classList.remove('playing');
+      document.getElementById('menu').style.display = 'flex';
+    }
+    window.returnToMenu = returnToMenu;
+  </script>
+</body>
+</html>

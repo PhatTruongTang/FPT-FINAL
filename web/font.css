@@ -1,0 +1,121 @@
+@font-face {
+    font-family: "Anan";
+    src: url("../fonts/AnandaBlackPersonalUseRegular-rg9Rx.ttf") format("truetype");
+}
+@font-face {
+    font-family: "BelieveIt";
+    src: url("../fonts/BelieveIt-DvLE.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'VHARIS';
+    src: url('../fonts/VHARIS.TTF') format('truetype');
+}
+@font-face {
+    font-family: 'VNcorsi';
+    src: url('../fonts/VNCORSI.TTF') format('truetype');
+}
+@font-face {
+    font-family: 'tuyen-duc';
+    src: url('../fonts/vps-tuyen-duc-italic.TTF') format('truetype');
+}
+@font-face {
+    font-family: 'VHAN';
+    src: url('../fonts/VHAVAN.TTF') format('truetype');
+}
+@font-face {
+    font-family: 'vpshanoi';
+    src: url('../fonts/vps-ha-noi-medium-hoa-italic.TTF') format('truetype');
+}
+@font-face {
+    font-family: 'vpshanoi-bold';
+    src: url('../fonts/vps-ha-noi-medium-hoa-bold-italic.TTF') format('truetype');
+}		
+@font-face {
+    font-family: 'vpscanthoHoa';
+    src: url('../fonts/vps-can-tho-hoa.TTF') format('truetype');
+}
+@font-face {
+    font-family: 'Supercharge';
+    src: url('../fonts/SuperchargeStraightCondensed-RpVWV.otf') format('opentype');
+}
+@font-face {
+    font-family: 'Vogu';
+    src: url('../fonts/VNVOGU.TTF') format('truetype');
+}
+@font-face {
+    font-family: 'South';
+    src: url('../fonts/VNSOUTHN.TTF') format('truetype');
+}
+@font-face {
+    font-family: 'VHHELS';
+    src: url('../fonts/VHHELS.TTF') format('truetype');
+}
+@font-face {
+    font-family: 'VNFREE';
+    src: url('../fonts/VNFREE.TTF') format('truetype');
+}
+@font-face {
+    font-family: "VNCORVI";
+    src: url('../fonts/VHCORVI.TTF') format('truetype');
+}
+/* Chỉ áp dụng font cho chữ được bọc trong <span class="custom-font"> */
+.custom-font {
+    font-family: "Anan", sans-serif;
+    font-weight: bold;
+}
+.custom-font2 {
+    font-family: "BelieveIt", sans-serif;
+    font-weight: bold;
+}
+.custom-font3 {
+    font-family: "tuyen-duc", sans-serif;
+    font-weight: bold;
+}
+.custom-font4 {
+    font-family: "VHAN", sans-serif;
+    font-weight: normal;
+}
+.custom-font5 {
+    font-family: "vpshanoi", sans-serif;
+    font-weight: bold;
+}
+.custom-font6 {
+    font-family: "vpshanoi-bold", sans-serif;
+    font-weight: bold;
+}
+.custom-font7 {
+    font-family: "vpscanthoHoa", sans-serif;
+    font-weight: bold;
+}
+.custom-font8 {
+    font-family: "Supercharge", sans-serif;
+    font-weight: bold;
+}
+.custom-font9 {
+    font-family: "hanoi", sans-serif;
+    font-weight: bold;
+}
+.custom-font10 {
+    font-family: "Vogu", sans-serif;
+    font-weight: bold;
+}
+.custom-font11 {
+    font-family: "South", sans-serif;
+    font-weight: bold;
+}
+.custom-font12 {
+    font-family: "VHHELS", sans-serif;
+    font-weight: bold;
+}
+.custom-font13 {
+    font-family: "VNFREE", sans-serif;
+    font-weight: bold;
+}
+.custom-font13 {
+    font-family: "VNco", sans-serif;
+    font-weight: bold;
+}
+.custom-font14 {
+    font-family: "VNCORVI", sans-serif;
+    font-weight: bold;
+}

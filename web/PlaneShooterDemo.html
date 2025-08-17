@@ -1,0 +1,2230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Plane Shooter Game</title>
+  <link rel="icon" href="data:,">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); overflow: hidden; font-family: sans-serif; }
+    canvas { display: block; margin: 0 auto; background: #222; border: 2px solid #fff; box-shadow: 0 0 25px #006aff, inset 0 0 10px #00ffcc; animation: pulse 2s infinite alternate;}
+    #actionButton {
+      display: block;
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 12px 24px;
+      font-size: 20px;
+      background-color: white;
+      border: none;
+      cursor: pointer;
+      z-index: 2;
+    }
+    #pauseMenu {
+      display: none;
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      z-index: 3;
+      text-align: center;
+      border: 2px solid black;
+    }
+    #pauseMenu button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+    #playerHealthBar {
+      position: absolute;
+      top: 10px; right: 10px;
+      width: 150px; height: 20px;
+      border: 2px solid white;
+      background-color: #444;
+      z-index: 10;
+    }
+    #healthFill {
+      height: 100%;
+      background-color: lime;
+      width: 100%;
+    }
+    
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="600" height="750" tabindex="1"></canvas>
+  <button id="actionButton">Start Game</button>
+  <div id="pauseMenu">
+    <h3>Game Paused</h3>
+    <p><strong>Controls:</strong></p>
+    <p>
+      Arrow Keys - Move<br>
+      Space - Shoot<br>
+      C - Toggle AutoShoot<br>
+      ESC - Pause/Resume<br>
+      Mouse Move - Move<br> 
+      Left Click - Shoot<br>
+      Right Click (Hold) - Charge X-Buster<br>
+      <br>
+      <em>Chọn chế độ điều khiển bên dưới:</em>
+    </p>
+  
+    <div style="margin: 10px 0;">
+      <label><input type="radio" name="controlMode" value="keyboard" checked onchange="enableKeyboardMode()"> Dùng Bàn phím</label><br>
+      <label><input type="radio" name="controlMode" value="mouse" onchange="enableMouseMode()"> Dùng Chuột</label>
+    </div>
+  
+    <button onclick="resumeGame()">Resume Game</button>
+  </div>
+  
+  <div id="playerHealthBar"><div id="healthFill"></div></div>
+
+  <!-- Audio Elements -->
+  <audio id="shootSound" src="Soundeffect/Xshot0.mp3" preload="auto"></audio>
+  <audio id="shootSound1" src="Soundeffect/Xshot.mp3" preload="auto"></audio>
+  <audio id="shootSound2" src="Soundeffect/Xshot4.mp3" preload="auto"></audio>
+  <audio id="shootSound3" src="Soundeffect/Xshot1.mp3" preload="auto"></audio>
+  <audio id="shootSound4" src="Soundeffect/Xshot2.mp3" preload="auto"></audio>
+  <audio id="shootSound5" src="Soundeffect/Xshot3.mp3" preload="auto"></audio>
+  <audio id="shootSound6" src="Soundeffect/Xshot6.mp3" preload="auto"></audio>
+  <audio id="Chargeshot1" src="Soundeffect/XChargeShot.mp3" preload="auto"></audio>
+  <audio id="Chargeshot2" src="Soundeffect/XChargeshot2.mp3" preload="auto"></audio>
+  <audio id="missileSound" src="Soundeffect/Misslelaunch.mp3" preload="auto"></audio>
+  <audio id="slashSound" src="Soundeffect/ZSlash.mp3" preload="auto"></audio>
+  <audio id="slashHitSound" src="Soundeffect/hit2.mp3" preload="auto"></audio>
+  <audio id="explosionSound" src="Soundeffect/Explosion.mp3" preload="auto"></audio>
+  <audio id="explosionSound1" src="Soundeffect/Explosion1.mp3" preload="auto"></audio>
+  <audio id="explosionSound2" src="Soundeffect/exploded2.mp3" preload="auto"></audio>
+  <audio id="hitSound" src="Soundeffect/hit.mp3" preload="auto"></audio>
+  <audio id="hitSound1" src="Soundeffect/hit3.mp3" preload="auto"></audio>
+  <audio id="hitSound2" src="Soundeffect/hit4.mp3" preload="auto"></audio>
+  <audio id="playerHitSound" src="Soundeffect/planeHit.mp3" preload="auto"></audio>
+  <audio id="playerDeathSound" src="Soundeffect/planeDeath1.mp3" preload="auto"></audio>
+  <audio id="bossSpreadFire" src="Soundeffect/Zshot.mp3" preload="auto"></audio>
+  <audio id="bossSpiralFire" src="Soundeffect/Zshot1.mp3" preload="auto"></audio>
+  <audio id="bossCrossFire" src="Soundeffect/Shot.mp3" preload="auto"></audio>
+  <audio id="power" src="Soundeffect/power.mp3" preload="auto"></audio>
+  <audio id="charge" src="Soundeffect/XCharge5.mp3" preload="auto"></audio>
+  <audio id="chargeloop" src="Soundeffect/XChargeLoop.mp3" preload="auto" loop></audio>
+  <audio id="bossDashSound" src="Soundeffect/dash2.mp3" preload="auto"></audio>
+  <audio id="bossHomingFire" src="Soundeffect/XShot4.mp3" preload="auto"></audio>
+
+  
+  <script>
+    // Gắn hàm rỗng drawUI nếu chưa có
+    function drawUI() {}
+
+    // Gắn toàn bộ game code ở đây (vì bạn đã có rồi, mình không lặp lại)
+    // ✅ Quan trọng: thêm khởi tạo biến global bị thiếu như bullets = [], slashes = [], etc. trong resetGame()
+
+    // Để đơn giản, giả sử code phía sau bạn đã sửa đúng (như trước), chỉ thiếu phần khởi tạo biến
+    // và drawUI bị gọi 2 lần nên xóa dòng drawUI thứ hai trong draw()
+
+    // Trong draw():
+    //  ...
+    //  drawScore();
+    //  drawUI(); <== giữ dòng này
+    //  drawUI(); <== ❌ xóa dòng này
+
+    // (Lưu ý: nội dung này là template sửa lỗi, bạn cần tích hợp thêm nếu code dài)
+  </script>
+  <script>
+    
+    const canvas = document.getElementById("gameCanvas");
+    const chargeAudio = document.getElementById("charge");
+    const loopAudio = document.getElementById("chargeloop");
+
+    const ctx = canvas.getContext("2d");
+    const actionButton = document.getElementById("actionButton");
+    const slashWaves = [];
+
+    let player, enemies, score, gameOver, bossSpawned, boss, bossBullets;
+    let bullets, missiles, slashes, powerUps, powerLevel;
+    let keys = {};  // ✅ Sửa ở đây
+
+    let autoShoot = false;
+    let paused = false;
+    let gameStarted = false;
+
+    // Chèn hàm phát âm thanh vào game của bạn
+    function playSound(id) {
+    const original = document.getElementById(id);
+    if (original) {
+      const clone = original.cloneNode();
+      clone.volume = original.volume;  // giữ nguyên âm lượng
+      clone.play();
+    }
+  }
+
+  function playShootSound() {
+    let id = "shootSound"; // mặc định
+
+    if (powerLevel >= 9) id = "shootSound5";
+    else if (powerLevel >= 7) id = "shootSound4";
+    else if (powerLevel >= 5) id = "shootSound3";
+    else if (powerLevel >= 3) id = "shootSound2";
+
+    playSound(id);
+  }
+
+
+    
+
+    // Gắn lại hàm shoot để thêm âm thanh
+    
+    
+    function updateHealthBar() {
+      const percent = Math.max(0, (player.health / player.maxHealth) * 100);
+      document.getElementById("healthFill").style.width = percent + "%";
+    }
+
+    function respawnPlayer() {
+      player.x = canvas.width / 2 - 20;
+      player.y = canvas.height + 50; // Bắt đầu ngoài canvas
+      player.targetY = canvas.height - 60;
+      player.respawning = true;
+
+      player.health = player.maxHealth;
+      updateHealthBar();
+
+      player.hasShield = true;
+      setTimeout(() => player.hasShield = false, 2000);
+
+      // 🔧 Reset toàn bộ nâng cấp
+      powerLevel = 0;
+      player.rapidFire = false;
+
+      // Reset các đối tượng khác
+      bullets = [];
+      missiles = [];
+      enemies = [];
+      bossBullets = []; // ✅ Sửa lỗi chính tả bossBulletsz → bossBullets
+      bossHomingBullets = []; // ✅ Thêm dòng này
+      
+      if (boss) {
+        boss.lastHitBySlash = 0;
+        boss.lastHitByWave = 0;
+      }
+    }
+
+
+
+    function resetGame() {
+      lives = 3;
+      gameOver = false; // ✅ đảm bảo reset lại trạng thái
+      slashes = [];
+      turrets = [];
+      slashWaves.length = 0;
+      player = {
+        x: canvas.width / 2 - 20, y: canvas.height - 60,
+        width: 40, height: 40,
+        color: "lime", speed: 5,
+        hasShield: false, rapidFire: false,
+        lastShotTime: 0, health: 100, maxHealth: 100
+      };
+      explosions = [];
+      turrets = []; //🔧 Danh sách các turret riêng lẻ
+      enemies = []; keys = {}; score = 0; gameOver = false;
+      bossSpawned = false; boss = null; bossBullets = [];
+      bullets = []; missiles = []; slashes = []; powerUps = [];
+      powerLevel = 0; autoShoot = false;
+      actionButton.style.display = "none";
+      updateHealthBar();
+      //startGameLoop(); //Thay
+      slashes = []; // trong resetGame()
+      bossHomingBullets = [];
+    }
+
+    function resumeGame() {
+      paused = false;
+      document.getElementById("pauseMenu").style.display = "none";
+      startGameLoop(); // ✅ Gọi lại requestAnimationFrame đúng cách
+    }
+
+    function shoot(x, y) {
+      if (player.dead || player.respawning) return; // Không bắn khi chết hoặc đang hồi sinh
+    playShootSound();
+
+    const createBullet = (x, y, angle, level = powerLevel, pierce = 0) =>
+      bullets.push({
+        x,
+        y,
+        vx: Math.cos(angle) * 5,
+        vy: Math.sin(angle) * 5,
+        angle,
+        level,
+        pierce
+      });
+
+    const createMissile = (x, y, vx = 0, vy = -5, homing = true) =>
+      missiles.push({ x, y, vx, vy, homing });
+
+    const centerX = player.x + player.width / 2;
+    const centerY = player.y + player.height / 2;
+
+    // Bắn từ từng khẩu turret riêng biệt
+    turrets.forEach(turret => {
+      const baseX = centerX + turret.side * turret.offsetX;
+      const baseY = centerY + turret.offsetY;
+
+      const shootAngle = turret.angle - Math.PI / 2;
+      const turretX = baseX + Math.cos(shootAngle) * turretLength;
+      const turretY = baseY + Math.sin(shootAngle) * turretLength;
+
+      
+      let pierce = 0;
+      if ((turret.level === 7 || turret.level === 9) && powerLevel >= 9) {
+        pierce = Math.min(powerLevel - 8, 3);
+      }
+      let bulletLevel = turret.level;
+
+      if (powerLevel === 11) {
+        if (turret.level === 3 || turret.level === 7) pierce = 1;
+        if (turret.level === 5 || turret.level === 9) bulletLevel = 10;
+      }
+      if (powerLevel === 12) {
+        bulletLevel = 12;
+      }
+
+      createBullet(turretX, turretY, shootAngle, bulletLevel, pierce);
+    });
+
+    // Bắn chính giữa
+    switch (powerLevel) {
+      case 0: {
+        const angle = -Math.PI / 2;
+        createBullet(x, y, angle, 0, 0);
+        break;
+      }
+      case 1: {
+        const angleLeft = -Math.PI / 2 - 0.1;
+        const angleRight = -Math.PI / 2 + 0.1;
+        createBullet(x - 5, y, angleLeft, 1, 0);
+        createBullet(x + 5, y, angleRight, 1, 0);
+        break;
+      }
+      default: {
+        for (let i = -2; i <= 2; i++) {
+          const angle = -Math.PI / 2 + i * 0.1;
+          let pierce = 0;
+
+          // 🎯 Chỉ viên -1 và +1 được xuyên
+          if ((i === -1 || i === 1) && powerLevel >= 9) {
+            pierce = Math.min(powerLevel - 8, 2); // max 2 cấp xuyên ở đạn chính
+          }
+
+          let bulletLevel = powerLevel;
+          if (powerLevel === 12) bulletLevel = 12;
+
+          createBullet(x + i * 5, y, angle, bulletLevel, pierce);
+          muzzleFlashes.push({ x, y, timer: 6 });
+        }
+        break;
+      }
+    }
+
+    // Bắn missile
+    const now = Date.now();
+    if (powerLevel >= 5 && now - lastMissileTime > missileCooldown) {
+      const missileSpeed = 5;
+      const spreadAngle = Math.PI / 14;
+      const leftX = player.x + 5;
+      const rightX = player.x + player.width - 5;
+      const missileY = player.y;
+
+      const angleLeft = -Math.PI / 2 - spreadAngle;
+      const angleRight = -Math.PI / 2 + spreadAngle;
+
+      createMissile(leftX, missileY, Math.cos(angleLeft) * missileSpeed, Math.sin(angleLeft) * missileSpeed);
+      createMissile(rightX, missileY, Math.cos(angleRight) * missileSpeed, Math.sin(angleRight) * missileSpeed);
+
+      if (powerLevel >= 6) {
+        const angleMoreLeft = -Math.PI / 2 - spreadAngle * 1.7;
+        const angleMoreRight = -Math.PI / 2 + spreadAngle * 1.7;
+
+        createMissile(leftX, missileY, Math.cos(angleMoreLeft) * missileSpeed, Math.sin(angleMoreLeft) * missileSpeed);
+        createMissile(rightX, missileY, Math.cos(angleMoreRight) * missileSpeed, Math.sin(angleMoreRight) * missileSpeed);
+      }
+
+      lastMissileTime = now;
+      playSound('missileSound');
+    }
+
+    // Slash và wave
+    if (powerLevel >= 7 && now - lastWaveTime > 3000) {
+      slashes.push({
+        x: player.x + player.width / 2,
+        y: player.y,
+        timer: 30,
+        hasHitBoss: false
+      });
+
+      slashWaves.push({
+        x: player.x + player.width / 2,
+        y: player.y - 20,
+        timer: 100,
+        hasHitBoss: false 
+      });
+
+      lastWaveTime = now;
+      playSound('slashSound');
+    }
+  }
+
+    // Thêm biến toàn cục để quản lý tên lửa
+    let lastTime = 0;
+    function gameLoop(timestamp) {
+      if (paused || gameOver) return;
+
+      const delta = timestamp - lastTime;
+      lastTime = timestamp;
+
+      update(delta);
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    function startGameLoop() {
+      lastTime = performance.now();  // Reset lại thời gian lần trước
+      requestAnimationFrame(gameLoop);
+    }
+
+
+    function update(delta) {
+  if (gameOver) return;
+
+  // Cập nhật đạn X-Buster
+  xBusterBullets.forEach((b, i) => {
+    b.x += b.vx;
+    b.y += b.vy;
+    b.timer--;
+    if (b.timer <= 0) xBusterBullets.splice(i, 1);
+    
+    // ✅ Đưa vào đúng bên trong vòng lặp để tránh lỗi
+    if (boss && !boss.invincible && b.super) {
+    energyCores.push({
+      x: boss.x + boss.width / 2,
+      y: boss.y + boss.height / 2,
+      radius: 60,
+      opacity: 1,
+      timer: 5000,
+      damageTimer: 0
+    });
+  }
+});
+
+  // Charge effects
+  let time = 0;
+  if (isCharging) {
+    time = (Date.now() - chargeStartTime) / 1000;
+
+    if (time > 3 && !chargeLoopPlaying) {
+      const loopAudio = document.getElementById("chargeloop");
+      if (loopAudio.readyState >= 2) {
+        loopAudio.play().catch(e => console.warn("Cannot play chargeloop:", e));
+        chargeLoopPlaying = true;
+      }
+    }
+
+    // Tạo hiệu ứng năng lượng mỗi 100ms
+    if (Math.floor(time * 10) % 2 === 0) {
+      chargeEffects.push({
+        x: player.x + player.width / 2,
+        y: player.y + player.height / 2,
+        radius: 10 + time * 10,
+        opacity: 1,
+        color: time < 1 ? "white" : time < 2 ? "cyan" : time < 3 ? "yellow" : time < 4 ? "orange" : "purple"
+      });
+    }
+  }
+
+  // Cập nhật hiệu ứng charge
+  for (let i = chargeEffects.length - 1; i >= 0; i--) {
+    const c = chargeEffects[i];
+    c.radius += 1.5;
+    c.opacity -= 0.02;
+    if (c.opacity <= 0) chargeEffects.splice(i, 1);
+  }
+
+  // Kiểm tra boss xuất hiện
+  if (score >= 100 && !bossSpawned) {
+    spawnBoss();
+    bossSpawned = true;
+  }
+
+  // Cập nhật game logic
+  updateEnemyBullets();
+  updatePlayer();
+  spawnEnemies();
+  spawnPowerUps();
+  updateBullets();
+  updateMissiles();
+  updateExplosions();
+  updateSlashes();
+  updateSlashWaves();
+  updateBossBullets();
+  updateHealthBar();
+  updateMuzzleFlashes();
+  updateFragments();
+  updateEnergyCores(delta);
+
+  // Cập nhật trạng thái turret theo power level
+  const levels = [3, 5, 7, 9];
+  for (let lvl of levels) {
+    if (powerLevel >= lvl && !turretStates.find(t => t.level === lvl)) {
+      turretStates.push({
+        level: lvl,
+        left: { angle: 0, target: 0 },
+        right: { angle: 0, target: 0 }
+      });
+    }
+  }
+}
+
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // 👈 vẽ trước
+      drawPlayer();
+      //vẽ đạn X_buster
+      xBusterBullets.forEach(b => {
+        ctx.save();
+        ctx.fillStyle = b.color;
+        ctx.shadowColor = b.color;
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+      
+      drawEnemies();
+      drawChargingAura(); // 👈 aura nên gần player
+      drawEnemyBullets();
+      drawPowerUps();
+      drawBoss();
+      drawBullets();
+      drawMissiles();
+      drawSlashes();         // <-- Và ở đây
+      drawSlashWaves();  // <-- nhớ gọi ở đây
+      drawExplosions();
+      drawBossBullets();
+      drawScore();
+      drawUI(); // score, HP, etc
+      drawMissileTrails();
+      drawMissiles();
+      drawMuzzleFlashes();
+      drawFragments();
+      drawEnergyCores();
+
+    }
+
+    function updatePlayer() {
+    if (player.respawning) {
+      const easing = 0.08; // Tốc độ easing nhỏ thì bay chậm hơn
+      player.y += (player.targetY - player.y) * easing;
+
+      if (Math.abs(player.y - player.targetY) < 1) {
+        player.y = player.targetY;
+        player.respawning = false;
+      }
+      return; // Dừng không cho bắn và di chuyển lúc này
+    }
+
+    if (!useMouseControl) {
+      if ((keys["ArrowLeft"] || keys["a"]) && player.x > 0) player.x -= player.speed;
+      if ((keys["ArrowRight"] || keys["d"]) && player.x + player.width < canvas.width) player.x += player.speed;
+      if ((keys["ArrowUp"] || keys["w"]) && player.y > 0) player.y -= player.speed;
+      if ((keys["ArrowDown"] || keys["s"]) && player.y + player.height < canvas.height) player.y += player.speed;
+    }
+
+    const fireRate = player.rapidFire ? 100 : 250;
+    if ((keys[" "] || autoShoot || mouseLeftDown) && Date.now() - player.lastShotTime > fireRate)
+    {
+      shoot(player.x + player.width / 2, player.y);
+      player.lastShotTime = Date.now();
+    }
+  }
+
+    function spawnEnemies() {
+      if (enemies.length > 200) return; // tránh lag khi quá đông
+
+      if (Math.random() < 0.02) {
+        enemies.push({
+          x: Math.random() * (canvas.width - 30),
+          y: -30,
+          width: 30, height: 30,
+          speed: 2 + Math.random() * 2,
+          color: "red",
+          hp: 60,
+          maxHp: 60,
+          lastHitBySlash: 0,
+          lastHitByWave: 0,
+          flashTimer: 0,
+          shootCooldown: Math.random() * 100 + 50
+        });
+      }
+    }
+
+    function updateEnemyBullets() {
+      for (let i = enemyBullets.length - 1; i >= 0; i--) {
+        const b = enemyBullets[i];
+        b.x += b.vx;
+        b.y += b.vy;
+
+        // Va chạm player
+        if (
+          b.x > player.x && b.x < player.x + player.width &&
+          b.y > player.y && b.y < player.y + player.height
+        ) {
+          if (!player.hasShield) {
+            player.health -= 10;
+            updateHealthBar();
+            playSound("playerHitSound");
+          }
+          enemyBullets.splice(i, 1);
+          continue;
+        }
+
+        // Xóa nếu ra ngoài màn hình
+        if (b.x < -20 || b.x > canvas.width + 20 || b.y < -20 || b.y > canvas.height + 20) {
+          enemyBullets.splice(i, 1);
+        }
+      }
+    }
+
+    function drawEnemyBullets() {
+      ctx.save();
+      ctx.fillStyle = "orange";
+      enemyBullets.forEach(b => {
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, 4, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.restore();
+    }
+
+    function drawEnemies() {
+    for (let ei = enemies.length - 1; ei >= 0; ei--) {
+      const e = enemies[ei]; // 👈 Phải đặt ngay đầu
+      // Bắn đạn
+      e.shootCooldown--;
+      if (e.shootCooldown <= 0) {
+        enemyBullets.push({
+          x: e.x + e.width / 2,
+          y: e.y + e.height,
+          vx: 0,
+          vy: 3
+        });
+        e.shootCooldown = Math.random() * 100 + 60;
+      }
+      for (let bi = xBusterBullets.length - 1; bi >= 0; bi--) {
+  const b = xBusterBullets[bi];
+
+  const hitboxSize = b.size * 1.2;
+
+  if (
+    b.x + hitboxSize > e.x &&
+    b.x - hitboxSize < e.x + e.width &&
+    b.y + hitboxSize > e.y &&
+    b.y - hitboxSize < e.y + e.height
+  ) {
+    // 💥 Gây sát thương
+    e.hp -= b.damage;
+    e.flashTimer = 5;
+    playSound("hitSound2");
+
+    if (b.super && !e.invincible) {
+    energyCores.push({
+      x: e.x + e.width / 2,
+      y: e.y + e.height / 2,
+      radius: 50,
+      opacity: 1,
+      timer: 3000,
+      damageTimer: 0,
+      target: e
+    });
+  }
+
+    // Hiệu ứng nổ nếu là Mega Blast
+    if (b.explode) {
+      explosions.push({ x: b.x, y: b.y, timer: 20, type: "normal" });
+    }
+
+    // ✅ Xử lý xuyên (nếu có)
+    if (b.pierce !== undefined) {
+      b.pierce--;
+      if (b.pierce <= 0) {
+        xBusterBullets.splice(bi, 1);
+      }
+    } else {
+      xBusterBullets.splice(bi, 1); // Không có thuộc tính xuyên thì xóa luôn
+    }
+
+    // ✅ Nếu enemy chết → xóa enemy & tạo hiệu ứng
+    if (e.hp <= 0) {
+      // ✅ Nếu là đạn Super Blast, tạo energy core tại chỗ enemy chết
+      if (b.super) {
+        energyCores.push({
+          x: e.x + e.width / 2,
+          y: e.y + e.height / 2,
+          radius: 50,
+          opacity: 1,
+          timer: 3000,
+          damageTimer: 0,
+          target: null // enemy đã chết, không gây tick nữa
+        });
+      }
+
+      enemies.splice(ei, 1);
+      score++;
+
+      // Mảnh vỡ
+      for (let i = 0; i < 6; i++) {
+        fragments.push({
+          x: e.x + e.width / 2,
+          y: e.y + e.height / 2,
+          vx: (Math.random() - 0.5) * 6,
+          vy: (Math.random() - 0.5) * 6,
+          color: e.color,
+          timer: 30
+        });
+      }
+
+      // Hiệu ứng nổ
+      explosions.push({
+        x: e.x + e.width / 2,
+        y: e.y + e.height / 2,
+        timer: 20,
+        type: "normal"
+      });
+      playSound("explosionSound2");
+
+      break; // ✅ Nếu enemy bị xóa, break khỏi vòng enemy
+    }
+
+    // ✅ KHÔNG break ở đây để đạn còn xử lý các enemy khác!
+  }
+}
+
+    // Vẽ thanh máu trên đầu enemy
+    ctx.fillStyle = "black";
+    ctx.fillRect(e.x, e.y - 6, e.width, 5);
+
+    ctx.fillStyle = "lime";
+    ctx.fillRect(e.x, e.y - 6, e.width * (e.hp / e.maxHp), 5);
+
+    e.y += e.speed;
+    ctx.fillRect(e.x, e.y, e.width, e.height);
+    
+    //Hiệu ứng trúng đạn kiểu MegaMan X
+    // ✅ Set màu enemy ngay trước khi vẽ enemy
+    if (e.flashTimer > 0) {
+      if (e.flashTimer % 4 < 2) {
+        ctx.fillStyle = "white";
+      } else {
+        ctx.fillStyle = e.color;
+      }
+      e.flashTimer--;
+    } else {
+      ctx.fillStyle = e.color;
+    }
+    ctx.fillRect(e.x, e.y, e.width, e.height);
+
+    // Va chạm với đạn
+    for (let bi = bullets.length - 1; bi >= 0; bi--) {
+      const b = bullets[bi];
+      if (
+        b.x > e.x && b.x < e.x + e.width &&
+        b.y > e.y && b.y < e.y + e.height
+      ) {
+        // ✅ Giảm máu và xử lý pierce đúng
+        e.hp -= 20;
+        playSound('hitSound1');
+        e.flashTimer = 5;
+
+        if (b.pierce && b.pierce > 0) {
+          b.pierce--; // giữ lại đạn
+        } else {
+          bullets.splice(bi, 1); // không xuyên thì xóa
+        }
+
+        if (e.hp <= 0) {
+        enemies.splice(ei, 1);
+        score++;
+        // Tạo mảnh vỡ từ enemy
+        for (let i = 0; i < 6; i++) {
+          fragments.push({
+            x: e.x + e.width / 2,
+            y: e.y + e.height / 2,
+            vx: (Math.random() - 0.5) * 6,
+            vy: (Math.random() - 0.5) * 6,
+            color: e.color,
+            timer: 30
+          });
+        }
+
+        // 💥 Thêm hiệu ứng nổ
+        explosions.push({
+          x: e.x + e.width / 2,
+          y: e.y + e.height / 2,
+          timer: 20,
+          type: "normal"
+        });
+        playSound("explosionSound2");
+        break;
+      }
+
+
+        if (!b.pierce || b.pierce <= 0) break; // chỉ break nếu không còn xuyên
+      }
+    }
+
+    // Va chạm với player
+    if (
+      e.x < player.x + player.width &&
+      e.x + e.width > player.x &&
+      e.y < player.y + player.height &&
+      e.y + e.height > player.y
+    ) {
+      enemies.splice(ei, 1); // Xóa enemy khi va chạm
+
+      if (!player.hasShield) {
+        player.health -= 20;
+        updateHealthBar();
+        playSound("playerHitSound");
+
+        if (player.health <= 0) {
+          lives--;
+          playSound("playerDeathSound");
+
+          if (lives > 0) {
+            respawnPlayer();
+            return;
+          } else {
+            gameOver = true;
+            actionButton.textContent = "Play Again";
+            actionButton.style.display = "block";
+            return;
+          }
+        }
+      }
+    }
+
+    // Enemy ra khỏi màn hình
+    if (e.y > canvas.height) {
+      enemies.splice(ei, 1);
+    }
+  }
+}
+
+  function updateFragments() {
+    for (let i = fragments.length - 1; i >= 0; i--) {
+      const f = fragments[i];
+      f.x += f.vx;
+      f.y += f.vy;
+      f.vy += 0.2; // trọng lực
+      f.timer--;
+      if (f.timer <= 0) fragments.splice(i, 1);
+    }
+  }
+
+  function drawFragments() {
+    ctx.save();
+    fragments.forEach(f => {
+      ctx.fillStyle = f.color;
+      ctx.globalAlpha = f.timer / 30;
+      ctx.fillRect(f.x, f.y, 4, 4);
+    });
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+function handlePlayerDeath() {
+  lives--;
+  playSound("playerDeathSound");
+
+  if (lives > 0) {
+    respawnPlayer();
+  } else {
+    gameOver = true;
+    actionButton.textContent = "Play Again";
+    actionButton.style.display = "block";
+  }
+}
+
+
+    function drawPowerUps() {
+      powerUps.forEach((p, i) => {
+        p.y += p.speed;
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, p.width, p.height);
+        if (
+          p.x < player.x + player.width &&
+          p.x + p.width > player.x &&
+          p.y < player.y + player.height &&
+          p.y + p.height > player.y
+        ) {
+          if (p.type === "power") {
+          powerLevel = Math.min(powerLevel + 1, 12);
+          playSound("power"); // <-- phát âm thanh mỗi lần nâng cấp
+          if (powerLevel === 4) {
+            missileCooldown = Math.max(500, missileCooldown - 200);
+          }
+        }
+  // thay 5 bằng 9
+            if (!turrets.find(t => t.level === powerLevel) && [3,5,7,9].includes(powerLevel)) {
+            // Thêm 2 turret (trái/phải) cho mỗi cấp
+            const offsetX = {3: 40, 5: 60, 7: 80, 9: 100}[powerLevel];
+            const offsetY = {3: 0, 5: 15, 7: 30, 9: 45}[powerLevel];
+            turrets.push(
+              { level: powerLevel, side: -1, angle: 0, target: 0, offsetX, offsetY },
+              { level: powerLevel, side: 1, angle: 0, target: 0, offsetX, offsetY }
+            );
+          }
+
+          // 👉 Cập nhật turretStates khi nâng cấp
+            const newLevel = powerLevel;
+            const existing = turretStates.map(t => t.level);
+            if (!existing.includes(newLevel) && [3, 5, 7, 9].includes(newLevel)) {
+              turretStates.push({
+                level: newLevel,
+                left: { angle: 0, target: 0 },
+                right: { angle: 0, target: 0 }
+              });
+            }
+          if (p.type === "heal") player.health = Math.min(player.health + 30, player.maxHealth);
+          if (p.type === "rapid") {
+            player.rapidFire = true;
+            setTimeout(() => player.rapidFire = false, 6000);
+          }
+          if (p.type === "shield") {
+            player.hasShield = true;
+            setTimeout(() => player.hasShield = false, 8000);
+          }
+          powerUps.splice(i, 1);
+        }
+      });
+    }
+
+    function spawnPowerUps() {
+      if (Math.random() < 0.01) {
+        const types = ["power", "heal", "rapid", "shield"];
+        const colors = {
+          power: "yellow", heal: "lime", rapid: "orange", shield: "cyan"
+        };
+        const type = types[Math.floor(Math.random() * types.length)];
+        powerUps.push({
+          type, x: Math.random() * (canvas.width - 20), y: -20,
+          width: 20, height: 20, speed: 2, color: colors[type]
+        });
+      }
+    }
+
+    // Additional turret data
+    let leftTurretAngle = 0;
+    let rightTurretAngle = 0;
+    let leftTurretTarget = 0;
+    let rightTurretTarget = 0;
+    let turretStates = []; // chứa dữ liệu riêng cho từng cặp turret
+    let turrets = []; // Danh sách các turret riêng lẻ theo cấp độ và bên trái/phải
+
+    const turretLength = 20;
+    const wingOffsetX = 40;
+    let lastMissileTime = 0;
+    let missileCooldown = 1500;
+
+    let lastSlashTime = 0;
+    let lastWaveTime = 0;
+
+    let lives = 3;
+
+    let missileTrails = [];
+    let muzzleFlashes = [];
+    let enemyBullets = [];
+    let fragments = [];
+
+    let isCharging = false;
+    let chargeStartTime = 0;
+    let xBusterBullets = [];
+    let chargeEffects = []; // hiệu ứng khi đang charge
+
+    let energyCores = [];
+
+    let chargeLoopPlaying = false;
+    let mouseLeftDown = false;
+    let mouseRightDown = false;
+
+    let useMouseControl = false;
+
+    function enableMouseMode() {
+      useMouseControl = true;
+    }
+
+    function enableKeyboardMode() {
+      useMouseControl = false;
+    }
+
+    function drawPlayer() {
+      ctx.save();
+      ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
+
+      ctx.fillStyle = player.hasShield ? "cyan" : player.color;
+      ctx.fillRect(-player.width / 2, -player.height / 2, player.width, player.height);
+
+      // Vẽ từng khẩu turret riêng biệt
+      if (powerLevel >= 3) {
+        turrets.forEach(turret => {
+          const speed = 0.05;
+          const maxAngle = 0.35;
+          const wave = Math.sin(Date.now() / (300 + turret.level * 100));
+          turret.target = wave * maxAngle * turret.side;
+          turret.angle += (turret.target - turret.angle) * speed;
+
+          ctx.save();
+          ctx.translate(turret.side * turret.offsetX, turret.offsetY);
+          ctx.rotate(turret.angle - Math.PI / 2);
+
+          const grad = ctx.createLinearGradient(0, 0, turretLength, 0);
+          grad.addColorStop(0, "cyan");
+          grad.addColorStop(1, "white");
+          ctx.fillStyle = grad;
+          ctx.shadowColor = "cyan";
+          ctx.shadowBlur = 10;
+          ctx.fillRect(0, -3, turretLength, 6);
+          ctx.shadowBlur = 0;
+
+          ctx.restore();
+        });
+      }
+
+    // ✅ Thêm hiệu ứng charge X5/X6 tại đây – trước restore
+    if (isCharging) {
+      const chargeTime = (Date.now() - chargeStartTime) / 1000;
+
+      let chargeColor = "white";
+      if (chargeTime > 0.5) chargeColor = "cyan";
+      if (chargeTime > 1.5) chargeColor = "yellow";
+      if (chargeTime > 3) chargeColor = "orange";
+      if (chargeTime > 4) chargeColor = "purple";
+
+      const baseRadius = 25 + Math.sin(performance.now() / 100) * 5;
+      const auraLayers = 3;
+
+      for (let i = 0; i < auraLayers; i++) {
+        const r = baseRadius + i * 6;
+        ctx.save();
+        ctx.rotate((performance.now() / (200 + i * 100)) * (i % 2 === 0 ? 1 : -1));
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.strokeStyle = chargeColor;
+        ctx.lineWidth = 2;
+        ctx.globalAlpha = 0.3 - i * 0.08;
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = chargeColor;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Glow center aura
+      ctx.beginPath();
+      ctx.arc(0, 0, baseRadius, 0, Math.PI * 2);
+      ctx.fillStyle = chargeColor;
+      ctx.globalAlpha = 0.15;
+      ctx.shadowBlur = 25;
+      ctx.shadowColor = chargeColor;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+
+    ctx.restore();
+  }
+
+    function drawChargeEffects() {
+      ctx.save();
+      chargeEffects.forEach(c => {
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, c.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = c.color;
+        ctx.globalAlpha = c.opacity;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      });
+      ctx.globalAlpha = 1;
+      ctx.restore();
+    }
+
+    function drawChargingAura() {
+      if (!isCharging) return;
+
+      const centerX = player.x + player.width / 2;
+      const centerY = player.y + player.height / 2;
+      const chargeTime = (Date.now() - chargeStartTime) / 1000;
+
+      // Giới hạn bán kính tối đa
+      const radius = Math.min(20 + chargeTime * 5, 60);
+      const angle = Date.now() / 200;
+
+      const auraColor = chargeTime > 4 ? "purple" : chargeTime > 3 ? "orange" : chargeTime > 2 ? "yellow" : chargeTime > 1 ? "cyan" : "white";
+
+      ctx.save();
+
+      // Glow trung tâm
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.fillStyle = auraColor;
+      ctx.globalAlpha = 0.2;
+      ctx.shadowColor = auraColor;
+      ctx.shadowBlur = 30;
+      ctx.fill();
+
+      // Các chấm glow quay quanh
+      ctx.globalAlpha = 1.0;
+      for (let i = 0; i < 4; i++) {
+        const a = angle + (Math.PI / 2) * i;
+        const x = centerX + Math.cos(a) * radius;
+        const y = centerY + Math.sin(a) * radius;
+
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = auraColor;
+        ctx.shadowColor = auraColor;
+        ctx.shadowBlur = 15;
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+    function drawScore() {
+      ctx.fillStyle = "white";
+      ctx.font = "20px Arial";
+      ctx.fillText(`Score: ${score}`, 10, 30);
+      ctx.fillText(`Power: ${powerLevel}`, 10, 55);
+      ctx.fillText(`Lives: ${lives}`, 10, 80);
+    }
+
+    function drawBullets() {
+  bullets.forEach(b => {
+    ctx.save();
+
+    const angle = b.angle ?? Math.atan2(b.vy, b.vx || -0.01);
+    ctx.translate(b.x, b.y);
+    ctx.rotate(angle);
+
+    // 🎯 Nếu là đạn xuyên
+    if (b.pierce && b.pierce > 0) {
+      // Màu theo cấp xuyên
+      let fill = "orange";
+      let shadow = "white";
+      let gradColor = "rgba(255, 140, 0, 0.6)";
+      switch (b.pierce) {
+        case 1:
+          fill = "orange";
+          shadow = "orange";
+          gradColor = "rgba(255, 140, 0, 0.6)";
+          break;
+        case 2:
+          fill = "#ff3030";
+          shadow = "red";
+          gradColor = "rgba(255, 80, 80, 0.6)";
+          break;
+        case 3:
+          fill = "magenta";
+          shadow = "magenta";
+          gradColor = "rgba(255, 0, 255, 0.6)";
+          break;
+      }
+
+      // 🔥 Vệt cháy dài (trail)
+      const trailLength = 40 + b.pierce * 10;
+      const trailWidth = 4 + b.pierce * 1.5;
+
+      const grad = ctx.createLinearGradient(-trailLength, 0, 0, 0);
+      grad.addColorStop(0, "rgba(255, 100, 0, 0)");
+      grad.addColorStop(0.5, gradColor);
+      grad.addColorStop(1, gradColor);
+      ctx.fillStyle = grad;
+      ctx.fillRect(-trailLength, -trailWidth / 2, trailLength, trailWidth);
+
+      // Đạn chính
+      ctx.fillStyle = fill;
+      ctx.shadowColor = shadow;
+      ctx.shadowBlur = 20;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 14 + b.pierce * 2, 6 + b.pierce, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+      return;
+    }
+
+    // 🌈 Đạn thường (không xuyên)
+    const lvl = b.level || 1;
+    let flameColor = "orange";
+
+    switch (lvl) {
+      case 1:
+      case 2:
+        ctx.fillStyle = "#f8f8f8";
+        ctx.shadowColor = "white";
+        ctx.shadowBlur = 6;
+        flameColor = "rgba(255, 255, 200, 0.4)";
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 6, 2, 0, 0, Math.PI * 2);
+        ctx.fill();
+        break;
+
+      case 3:
+      case 4:
+        ctx.fillStyle = "cyan";
+        ctx.shadowColor = "cyan";
+        ctx.shadowBlur = 8;
+        flameColor = "rgba(0, 255, 255, 0.4)";
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 8, 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+        break;
+
+      case 5:
+      case 6:
+        ctx.fillStyle = "#0ff";
+        ctx.shadowColor = "white";
+        ctx.shadowBlur = 10;
+        flameColor = "rgba(0, 255, 255, 0.5)";
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 10, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+        break;
+
+      case 7:
+      case 8:
+        ctx.fillStyle = "yellow";
+        ctx.shadowColor = "orange";
+        ctx.shadowBlur = 12;
+        flameColor = "rgba(255, 165, 0, 0.6)";
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 12, 5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        break;
+
+      case 9:
+      case 10:
+        ctx.fillStyle = "magenta";
+        ctx.shadowColor = "white";
+        ctx.shadowBlur = 14;
+        flameColor = "rgba(255, 0, 255, 0.6)";
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 14, 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+        break;
+
+      case 11:
+        ctx.fillStyle = "orange";
+        ctx.shadowColor = "orange";
+        ctx.shadowBlur = 16;
+        flameColor = "rgba(255, 140, 0, 0.6)";
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 16, 7, 0, 0, Math.PI * 2);
+        ctx.fill();
+        break;
+
+      case 12:
+        ctx.fillStyle = "red";
+        ctx.shadowColor = "red";
+        ctx.shadowBlur = 18;
+        flameColor = "rgba(255, 0, 0, 0.6)";
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 18, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+        break;
+    }
+
+    // ✨ Trail glow cho đạn thường
+    const trailGrad = ctx.createRadialGradient(-10, 0, 0, -10, 0, 12);
+    trailGrad.addColorStop(0, flameColor);
+    trailGrad.addColorStop(1, "rgba(0,0,0,0)");
+
+    ctx.fillStyle = trailGrad;
+    ctx.beginPath();
+    ctx.ellipse(-10, 0, 14, 5, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  });
+}
+
+
+
+    function updateBullets() {
+      bullets.forEach(b => {
+        b.x += b.vx;
+        b.y += b.vy;
+      });
+    // ✨ Đoạn này giữ lại đạn trong vùng hiển thị (thậm chí một chút ngoài rìa)
+    bullets = bullets.filter(b =>
+      b.x >= -20 && b.x <= canvas.width + 20 &&
+      b.y >= -20 && b.y <= canvas.height + 20
+    );
+  }
+
+    function drawMissiles() {
+    ctx.save();
+    missiles.forEach(m => {
+      const angle = Math.atan2(m.vy, m.vx || -0.01); // tránh chia 0
+      ctx.save();
+      ctx.translate(m.x, m.y);
+      ctx.rotate(angle);
+
+      ctx.fillStyle = "orange";
+      ctx.shadowColor = "red";
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 10, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    });
+    ctx.restore();
+  }
+
+  function drawMissileTrails() {
+  ctx.save();
+  for (let i = missileTrails.length - 3; i >= 0; i--) {
+    const t = missileTrails[i];
+    ctx.globalAlpha = t.opacity;
+    const grad = ctx.createRadialGradient(t.x, t.y, 0, t.x, t.y, t.size);
+    grad.addColorStop(0, `rgba(255, 200, 100, ${t.opacity})`);
+    grad.addColorStop(1, "rgba(0,0,0,0)");
+
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.ellipse(t.x, t.y, t.size * 3.5, t.size * 1.2, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    t.opacity -= 0.01;
+    t.size *= 0.98;
+
+
+    if (t.opacity <= 0.01 || t.size <= 0.5) missileTrails.splice(i, 1);
+  }
+  ctx.restore();
+}
+
+    
+function updateMissiles() {
+  for (let i = missiles.length - 1; i >= 0; i--) {
+    const m = missiles[i];
+
+    // Homing missile tracking
+    if (m.homing) {
+    let target = null;
+
+    if (boss && !boss.invincible) {
+      target = {
+        x: boss.x + boss.width / 2,
+        y: boss.y + boss.height / 2
+      };
+    } else if (enemies.length > 0) {
+      target = enemies.reduce((a, b) => {
+        const da = (a.x - m.x) ** 2 + (a.y - m.y) ** 2;
+        const db = (b.x - m.x) ** 2 + (b.y - m.y) ** 2;
+        return da < db ? a : b;
+      });
+    }
+
+    if (target) {
+      const dx = target.x - m.x;
+      const dy = target.y - m.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      m.vx = (dx / dist) * 5;
+      m.vy = (dy / dist) * 5;
+    }
+  }
+
+    // Update position
+    m.x += m.vx;
+    m.y += m.vy;
+
+    // Trail effect
+    missileTrails.push({
+      x: m.x - m.vx * 4,  // 👉 đẩy khói ra sau
+      y: m.y - m.vy * 4,
+      opacity: 0.6,
+      size: 12  // 👉 to hơn chút
+    });
+
+
+    // Remove if out of bounds
+    if (
+      m.x < -20 || m.x > canvas.width + 20 ||
+      m.y < -20 || m.y > canvas.height + 20
+    ) {
+      missiles.splice(i, 1);
+      continue;
+    }
+
+    // Collision with enemies
+    for (let j = enemies.length - 1; j >= 0; j--) {
+      const e = enemies[j];
+      const dx = m.x - (e.x + e.width / 2);
+      const dy = m.y - (e.y + e.height / 2);
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 20) {
+        enemies.splice(j, 1);
+        missiles.splice(i, 1);
+
+        // 💥 Muzzle flash-like explosion on impact
+        explosions.push({
+          x: m.x,
+          y: m.y,
+          timer: 8,
+          type: "muzzle"
+        });
+
+        playSound("explosionSound1");
+        score++;
+        break;
+      }
+    }
+  }
+}
+
+    
+    function updateMuzzleFlashes() {
+      for (let i = muzzleFlashes.length - 1; i >= 0; i--) {
+        muzzleFlashes[i].timer--;
+        if (muzzleFlashes[i].timer <= 0) {
+          muzzleFlashes.splice(i, 1);
+        }
+      }
+    }
+    
+    function drawMuzzleFlashes() {
+    ctx.save();
+    muzzleFlashes.forEach(flash => {
+      const alpha = flash.timer / 6;
+      const length = 50;  // chiều dài chớp sáng
+      const width = 12;   // chiều rộng chớp sáng
+
+      // Gradient theo chiều dọc từ đỉnh xuống
+      const grad = ctx.createLinearGradient(flash.x, flash.y, flash.x, flash.y - length);
+      grad.addColorStop(0, `rgba(255, 255, 255, ${alpha})`);
+      grad.addColorStop(0.3, `rgba(255, 200, 50, ${alpha})`);
+      grad.addColorStop(0.7, `rgba(255, 100, 0, ${alpha * 0.5})`);
+      grad.addColorStop(1, `rgba(255, 0, 0, 0)`);
+
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(flash.x - width / 2, flash.y);            // đáy trái
+      ctx.lineTo(flash.x + width / 2, flash.y);            // đáy phải
+      ctx.lineTo(flash.x, flash.y - length);               // đỉnh
+      ctx.closePath();
+      ctx.fill();
+    });
+    ctx.restore();
+  }
+
+
+    let explosions = [];
+
+    function updateExplosions() {
+      explosions = explosions.filter(e => e.timer-- > 0);
+    }
+
+    function drawExplosions() {
+      explosions.forEach(e => {
+        ctx.save();
+
+        // 👇 Chọn màu theo loại
+        let color;
+        if (e.type === "slash") {
+          color = `rgba(0, 255, 255, ${e.timer / 20})`;   // xanh cyan
+        } else if (e.type === "muzzle") {
+          color = `rgba(255,255,100,${e.timer / 8})`;     // vàng nhạt
+          ctx.shadowColor = "white";
+          ctx.shadowBlur = 10;
+        } else {
+          color = `rgba(255,165,0,${e.timer / 20})`;      // cam thường
+        }
+
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, 40 - e.timer, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+    }
+
+
+    function updateSlashes() {
+    const now = Date.now();
+    for (let i = slashes.length - 1; i >= 0; i--) {
+      const s = slashes[i];
+      s.timer--;
+      if (s.timer <= 0) {
+        slashes.splice(i, 1);
+        continue;
+      }
+
+      const radius = 60;
+      for (let j = enemies.length - 1; j >= 0; j--) {
+        const e = enemies[j];
+        const dx = (e.x + e.width / 2) - s.x;
+        const dy = (e.y + e.height / 2) - s.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        // 👇 Thêm cooldown 100ms mỗi enemy
+        if (dist < radius && now - e.lastHitBySlash > 100) {
+          e.lastHitBySlash = now;
+          e.hp -= 20;
+          e.flashTimer = 5; // 👈 enemy bị flash 5 frame
+          if (boss) boss.flashTimer = 5; // ✅ thêm điều kiện an toàn
+          playSound("slashHitSound");
+
+          if (e.hp <= 0) {
+            enemies.splice(j, 1);
+            score++;
+          }
+        }
+        // Gây damage cho boss nếu slash này chưa từng đánh boss
+        if (boss && !boss.invincible && !s.hasHitBoss) {
+          const dx = (boss.x + boss.width / 2) - s.x;
+          const dy = (boss.y + boss.height / 2) - s.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < radius) {
+            s.hasHitBoss = true;
+            boss.health -= 20;
+            boss.flashTimer = 5;
+            explosions.push({ x: boss.x + 50, y: boss.y + 50, timer: 20, type: 'slash' });
+            playSound("slashHitSound");
+          }
+        }
+      }
+    }
+  }
+
+
+
+
+  function drawSlashes() {
+  ctx.save();
+  slashes.forEach(s => {
+    const alpha = Math.max(0, s.timer / 30);
+    const t = 1 - s.timer / 30; // tiến trình từ 0 → 1
+
+    // Vị trí di chuyển theo vòng cung từ trái → phải
+    const arcAngle = Math.PI * 1.2;
+    const angle = Math.PI + arcAngle * t;
+    const radius = 60;
+
+    const x = s.x + Math.cos(angle) * radius;
+    const y = s.y + Math.sin(angle) * radius;
+
+    const size = 40;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+
+    const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size);
+    gradient.addColorStop(0, `rgba(0,255,255,${alpha})`);
+    gradient.addColorStop(1, `rgba(0,255,255,0)`);
+
+    ctx.fillStyle = gradient;
+    ctx.shadowColor = "cyan";
+    ctx.shadowBlur = 20;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, size * 1.2, size * 0.4, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  });
+  ctx.restore();
+}
+
+
+  // trong updateSlashWaves():
+  function updateSlashWaves() {
+  const now = Date.now();
+  for (let i = slashWaves.length - 1; i >= 0; i--) {
+    const wave = slashWaves[i];
+    wave.y -= 6;
+    wave.timer--;
+
+    const radius = 90;
+    for (let j = enemies.length - 1; j >= 0; j--) {
+      const e = enemies[j];
+      const dx = (e.x + e.width / 2) - wave.x;
+      const dy = (e.y + e.height / 2) - wave.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < radius && now - e.lastHitByWave > 100) {
+        e.lastHitByWave = now;
+        e.hp -= 25;
+        e.flashTimer = 5; // 👈 enemy bị flash 5 frame
+        if (boss) boss.flashTimer = 5; // ✅ thêm điều kiện an toàn
+        playSound("slashHitSound");
+
+        if (e.hp <= 0) {
+          enemies.splice(j, 1);
+          score++;
+          explosions.push({
+            x: e.x + e.width / 2,
+            y: e.y + e.height / 2,
+            timer: 20,
+            type: "slash"
+          });
+        }
+        // Gây damage cho boss nếu có
+        if (boss && !boss.invincible) {
+          const dx = (boss.x + boss.width / 2) - wave.x;
+          const dy = (boss.y + boss.height / 2) - wave.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < radius && !wave.hasHitBoss) {
+            wave.hasHitBoss = true;
+            boss.health -= 25;
+            explosions.push({ x: boss.x + 50, y: boss.y + 50, timer: 20, type: 'slash' });
+            playSound("slashHitSound");
+          }
+        }
+      }
+    }
+
+    if (wave.timer <= 0) {
+      slashWaves.splice(i, 1);
+    }
+  }
+}
+
+function drawSlashWaves() {
+  ctx.save();
+  slashWaves.forEach(w => {
+    const alpha = Math.max(0, w.timer / 100);
+    const rippleCount = 5;
+
+    ctx.translate(w.x, w.y);
+    ctx.rotate(-Math.PI / 1.2);
+
+    for (let i = 0; i < rippleCount; i++) {
+      const scale = 1 + i * 0.3;
+      const fade = alpha * (1 - i * 0.2);
+
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 60 * scale, 12 * scale, 0, 0, Math.PI * 2);
+
+      const gradient = ctx.createRadialGradient(0, 0, 10, 0, 0, 60 * scale);
+      gradient.addColorStop(0, `rgba(0,255,255,${fade})`);
+      gradient.addColorStop(0.5, `rgba(0,150,255,${fade * 0.7})`);
+      gradient.addColorStop(1, `rgba(0,50,255,0)`);
+
+      ctx.fillStyle = gradient;
+      ctx.shadowColor = "cyan";
+      ctx.shadowBlur = 40;
+      ctx.fill();
+    }
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // reset transform
+  });
+  ctx.restore();
+}
+
+  function fireXbuster(chargeTime) {
+    const x = player.x + player.width / 2;
+    const y = player.y;
+
+    if (chargeTime < 0.5) {
+      // Cấp 1 - Đạn thường
+      xBusterBullets.push({
+        x, y, vx: 0, vy: -6,
+        size: 6, damage: 15,
+        color: "white", timer: 100
+      });
+      playSound("shootSound3"); // Âm cấp 1
+
+    } else if (chargeTime < 1.5) {
+      // Cấp 2 - Đạn đôi
+      xBusterBullets.push({ x: x - 8, y, vx: -1, vy: -6, size: 8, damage: 25, color: "cyan", timer: 100 });
+      xBusterBullets.push({ x: x + 8, y, vx: 1, vy: -6, size: 8, damage: 25, color: "cyan", timer: 100 });
+      playSound("shootSound6"); // Âm cấp 2
+
+    } else if (chargeTime < 3) {
+      // Cấp 3 - Large Blast → xuyên 2 lần
+      xBusterBullets.push({
+        x, y, vx: 0, vy: -6,
+        size: 30, damage: 40,
+        color: "yellow", timer: 100,
+        pierce: 10 // 💥 xuyên 10 enemy
+      });
+      playSound("Chargeshot1"); // Âm cấp 3
+
+    } else if (chargeTime < 4) {
+      // Cấp 4 - Mega Blast → xuyên vô hạn
+      xBusterBullets.push({
+        x, y, vx: 0, vy: -7,
+        size: 40, damage: 60,
+        color: "orange", timer: 100,
+        explode: true,
+        pierce: Infinity // 💥 xuyên vô hạn
+      });
+      playSound("Chargeshot2"); // Âm cấp 4 (Mega Blast)
+    
+    } else {
+    // Cấp 5 - SUPER BLAST
+    xBusterBullets.push({
+      x, y, vx: 0, vy: -8,
+      size: 60, damage: 90,
+      color: "purple",
+      timer: 120,
+      super: true,
+      explode: true,
+      pierce: Infinity
+    });
+    playSound("Chargeshot2"); // Hoặc âm riêng nếu bạn có
+  }
+}
+
+function updateEnergyCores(delta) {
+  energyCores.forEach(core => {
+    core.timer -= delta;
+    core.damageTimer += delta;
+
+    // Tick damage mỗi 0.1s
+    if (core.damageTimer >= 100 && core.target && core.target.health > 0) {
+      core.target.health -= 2;
+      core.damageTimer = 0;
+      playSound("hitSound");
+    }
+
+    // Thu nhỏ & mờ dần
+    core.radius = Math.max(0, core.radius - delta * 0.02);
+    core.opacity = Math.max(0, core.opacity - delta / 5000);
+  });
+
+  // Xoá core đã hết thời gian hoặc không còn mục tiêu
+  energyCores = energyCores.filter(core =>
+    core.timer > 0 && core.radius > 1 && core.opacity > 0.01 && core.target && core.target.health > 0
+  );
+}
+
+
+
+
+function drawEnergyCores() {
+  energyCores.forEach(c => {
+    ctx.save();
+    const g = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, c.radius);
+    g.addColorStop(0, `rgba(255,0,255,${c.opacity})`);
+    g.addColorStop(0.5, `rgba(128,0,255,${c.opacity * 0.5})`);
+    g.addColorStop(1, `rgba(0,0,0,0)`);
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, c.radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  });
+}
+
+// Boss enhancement for Touhou-style bullet hell shooter
+// Fixed: Missiles and slash can damage boss
+// Fixed: Homing missiles target boss
+// Fixed: Pierce bullets correctly penetrate enemies
+// Updated: Boss spreads aim at player; enters slowly from top
+// Updated: Boss dodges with smooth slide + trail effect
+// Added: Sound when boss bullets hit player, and sound cues for boss skill firing
+
+let bossTrails = [];
+
+function spawnBoss() {
+  boss = {
+    x: canvas.width / 2 - 50,
+    y: -150,
+    width: 100,
+    height: 100,
+    speed: 2,
+    color: "purple",
+    health: 1000,
+    maxHealth: 1000,
+    lastHitBySlash: 0,   // 👈 mới
+    lastHitByWave: 0,     // 👈 mới
+    flashTimer: 0,
+    shootTimer: 0,
+    phase: 1,
+    invincible: true,
+    dashCooldown: 0,
+    entering: true,
+    dashing: false,
+    dashDir: 0,
+    dashTime: 0,
+    alpha: 0,
+    fadeIn: false
+  };
+  bossTrails = [];
+}
+
+function drawBoss() {
+  if (!boss) return;
+
+  // Boss entering animation from top
+  if (boss.entering) {
+    boss.y += boss.speed;
+    if (boss.y >= 50) {
+      boss.y = 50;
+      boss.invincible = true;
+      boss.fadeIn = true; // start fade-in
+      boss.entering = false;
+    }
+
+    // Glowing ring effect during entrance
+    ctx.save();
+    ctx.globalAlpha = Math.sin(Date.now() / 100) * 0.5 + 0.5;
+    ctx.fillStyle = "white";
+    ctx.beginPath();
+    ctx.arc(boss.x + boss.width / 2, boss.y + boss.height / 2, 60, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.restore();
+
+    return;
+  }
+
+  // Fade in effect after arrival
+  if (boss.fadeIn) {
+    boss.alpha += 0.02;
+    if (boss.alpha >= 1) {
+      boss.alpha = 1;
+      boss.fadeIn = false;
+      boss.invincible = false;
+    }
+  }
+
+  if (!boss.dashing && boss.dashCooldown <= 0 && Math.random() < 0.02) {
+    boss.dashing = true;
+    boss.dashTime = 20;
+    boss.dashDir = Math.random() < 0.5 ? -1 : 1;
+    boss.dashCooldown = 80;
+
+    // 🔊 Phát âm thanh dash
+    playSound("bossDashSound");
+  }
+
+  if (boss.dashing) {
+    boss.x += boss.dashDir * 4;
+    boss.x = Math.max(0, Math.min(canvas.width - boss.width, boss.x));
+    bossTrails.push({ x: boss.x, y: boss.y, opacity: 0.5 });
+    if (--boss.dashTime <= 0) boss.dashing = false;
+  } else {
+    boss.dashCooldown--;
+  }
+
+  if (boss.health < boss.maxHealth * 0.66) boss.phase = 2;
+  if (boss.health < boss.maxHealth * 0.33) boss.phase = 3;
+
+  for (let i = bossTrails.length - 1; i >= 0; i--) {
+    const t = bossTrails[i];
+    ctx.fillStyle = `rgba(128, 0, 128, ${t.opacity})`;
+    ctx.fillRect(t.x, t.y, boss.width, boss.height);
+    t.opacity -= 0.05;
+    if (t.opacity <= 0) bossTrails.splice(i, 1);
+  }
+
+  ctx.save();
+  ctx.globalAlpha = boss.alpha;
+  ctx.fillStyle = boss.flashTimer > 0 ? "white" : boss.color;
+  ctx.fillRect(boss.x, boss.y, boss.width, boss.height);
+  
+  if (boss.flashTimer > 0) boss.flashTimer--;
+  ctx.restore();
+
+  ctx.fillStyle = "red";
+  ctx.fillRect(boss.x, boss.y - 10, boss.width, 5);
+  ctx.fillStyle = "lime";
+  ctx.fillRect(boss.x, boss.y - 10, boss.width * (boss.health / boss.maxHealth), 5);
+
+  boss.shootTimer++;
+
+  if (boss.shootTimer % 90 === 0) {
+    playSound("bossSpreadFire");
+    const count = 10;
+    const originX = boss.x + boss.width / 2;
+    const originY = boss.y + boss.height / 2;
+    const angleToPlayer = Math.atan2(player.y - originY, player.x - originX);
+    const spread = Math.PI / 6;
+
+    for (let i = 0; i < count; i++) {
+      const angle = angleToPlayer - spread / 2 + (i * spread / (count - 1));
+      bossBullets.push({
+        x: originX,
+        y: originY,
+        vx: Math.cos(angle) * 3,
+        vy: Math.sin(angle) * 3,
+        color: "orange"
+      });
+    }
+  }
+
+  if (boss.phase >= 2 && boss.shootTimer % 60 === 0) {
+    playSound("bossSpiralFire");
+    const angleOffset = (boss.shootTimer / 10) % (2 * Math.PI);
+    for (let i = 0; i < 12; i++) {
+      const angle = angleOffset + (i * Math.PI / 6);
+      bossBullets.push({
+        x: boss.x + boss.width / 2,
+        y: boss.y + boss.height / 2,
+        vx: Math.cos(angle) * 2.5,
+        vy: Math.sin(angle) * 2.5,
+        color: "magenta"
+      });
+    }
+  }
+
+  if (boss.phase >= 3 && boss.shootTimer % 40 === 0) {
+    playSound("bossCrossFire");
+    const dirs = [
+      { vx: 3, vy: 3 }, { vx: -3, vy: 3 },
+      { vx: 3, vy: -3 }, { vx: -3, vy: -3 }
+    ];
+    dirs.forEach(d => {
+      bossBullets.push({
+        x: boss.x + boss.width / 2,
+        y: boss.y + boss.height / 2,
+        vx: d.vx, vy: d.vy,
+        color: "cyan"
+      });
+    });
+  }
+
+  bullets.forEach((b, i) => {
+    if (
+      b.x > boss.x && b.x < boss.x + boss.width &&
+      b.y > boss.y && b.y < boss.y + boss.height
+    ) {
+      if (!boss.invincible) boss.health--;
+      playSound("hitSound2");  // ✅ Phát tiếng khi boss bị đạn bắn
+      if (b.pierce && b.pierce > 0) {
+        b.pierce--;
+      } else {
+        bullets.splice(i, 1);
+      }
+    }
+  });
+
+  missiles.forEach((m, i) => {
+    const dx = (boss.x + boss.width / 2) - m.x;
+    const dy = (boss.y + boss.height / 2) - m.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 40 && !boss.invincible) {
+      boss.health -= 10;
+      missiles.splice(i, 1);
+      explosions.push({ x: boss.x + 50, y: boss.y + 50, timer: 20 });
+      playSound("explosionSound1");
+    }
+  });
+
+  slashes.forEach((s) => {
+    const dx = boss.x + boss.width / 2 - s.x;
+    const dy = boss.y + boss.height / 2 - s.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const now = Date.now();
+
+    if (dist < 60 && !boss.invincible && now - boss.lastHitBySlash > 100) {
+      boss.lastHitBySlash = now;
+      boss.health -= 20;
+      explosions.push({ x: boss.x + 50, y: boss.y + 50, timer: 20, type: 'slash' });
+      playSound("slashHitSound");
+    }
+  });
+
+
+  // 🔥 Boss bắn đạn homing ở phase 3
+  if (boss.phase >= 3 && boss.shootTimer % 180 === 0) {
+    playSound("bossHomingFire");
+    bossHomingBullets.push({
+      x: boss.x + boss.width / 2,
+      y: boss.y + boss.height,
+      vx: 0,
+      vy: 3,
+      timer: 0
+    });
+  }
+
+    xBusterBullets.forEach((b, i) => {
+    if (
+      b.x > boss.x && b.x < boss.x + boss.width &&
+      b.y > boss.y && b.y < boss.y + boss.height
+    ) {
+      if (!boss.invincible) {
+        boss.health -= b.damage;
+        boss.flashTimer = 5;
+        explosions.push({ x: boss.x + 50, y: boss.y + 50, timer: 20, type: 'slash' });
+        playSound("hitSound2");
+
+        // ✅ THÊM Ở ĐÂY
+        if (b.super) {
+          energyCores.push({
+            x: boss.x + boss.width / 2,
+            y: boss.y + boss.height / 2,
+            radius: 60,
+            opacity: 1,
+            timer: 5000,
+            damageTimer: 0,
+            target: boss
+          });
+          xBusterBullets.splice(i, 1); // Huỷ đạn sau 1 lần trúng
+          return; // Đừng xử lý tiếp
+
+        }
+      }
+
+      // xử lý xuyên đạn
+      if (b.pierce !== undefined) {
+        b.pierce--;
+        if (b.pierce <= 0) xBusterBullets.splice(i, 1);
+      } else {
+        xBusterBullets.splice(i, 1);
+      }
+    }
+  });
+
+  // Boss chết
+  if (boss.health <= 0) {
+    score += 200;
+    boss = null;
+    gameOver = true;
+    actionButton.textContent = "Play Again";
+    actionButton.style.display = "block";
+    }
+  }
+
+
+// Boss enhancement: Adds homing bullets that disable after 10 seconds
+
+let bossHomingBullets = [];
+
+function updateBossBullets() {
+  for (let i = bossBullets.length - 1; i >= 0; i--) {
+    const b = bossBullets[i];
+    b.x += b.vx;
+    b.y += b.vy;
+
+    if (
+      b.x < player.x + player.width &&
+      b.x > player.x &&
+      b.y < player.y + player.height &&
+      b.y > player.y
+    ) {
+      if (!player.hasShield) {
+        player.health -= 20;
+        updateHealthBar();
+        playSound("playerHitSound");
+        bossBullets.splice(i, 1);
+
+        if (player.health <= 0) {
+          handlePlayerDeath();
+          return;
+        }
+      } else {
+        bossBullets.splice(i, 1);
+      }
+    }
+
+    if (
+      b.y > canvas.height + 20 ||
+      b.y < -20 ||
+      b.x < -20 ||
+      b.x > canvas.width + 20
+    ) {
+      bossBullets.splice(i, 1);
+    }
+  }
+
+    for (let i = bossHomingBullets.length - 1; i >= 0; i--) {
+    const h = bossHomingBullets[i];
+    h.timer++;
+
+    if (h.timer === 200) {
+      // Stop homing at 10s
+      // Keep current vx, vy
+    } else if (h.timer < 200) {
+      const dx = player.x + player.width / 2 - h.x;
+      const dy = player.y + player.height / 2 - h.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist > 0) {
+        const speed = 2.5;
+        h.vx = (dx / dist) * speed;
+        h.vy = (dy / dist) * speed;
+      }
+    }
+
+    h.x += h.vx;
+    h.y += h.vy;
+
+    // Collision with player
+    if (
+      h.x < player.x + player.width &&
+      h.x > player.x &&
+      h.y < player.y + player.height &&
+      h.y > player.y
+    ) {
+      if (!player.hasShield) {
+        player.health -= 30;
+        updateHealthBar();
+        playSound("playerHitSound");
+        bossHomingBullets.splice(i, 1);
+
+        if (player.health <= 0) {
+          handlePlayerDeath();
+          return;
+        }
+      } else {
+        bossHomingBullets.splice(i, 1);
+      }
+    }
+
+    // Remove if out of bounds
+    if (
+      h.y > canvas.height + 20 ||
+      h.y < -20 ||
+      h.x < -20 ||
+      h.x > canvas.width + 20
+    ) {
+      bossHomingBullets.splice(i, 1);
+    }
+  }
+
+}
+
+function drawBossBullets() {
+  ctx.save();
+  bossBullets.forEach(b => {
+    ctx.fillStyle = b.color || "orange";
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, 6, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  bossHomingBullets.forEach(h => {
+    ctx.fillStyle = "lime";
+    ctx.beginPath();
+    ctx.arc(h.x, h.y, 8, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  ctx.restore();
+}
+
+
+canvas.addEventListener("mousedown", e => {
+  if (e.button === 0) mouseLeftDown = true;
+  if (e.button === 2) {
+    mouseRightDown = true;
+    if (useMouseControl && !isCharging) {
+      isCharging = true;
+      chargeStartTime = Date.now();
+
+      const chargeAudio = document.getElementById("charge");
+      if (chargeAudio.readyState >= 2) {
+        chargeAudio.play().catch(e => console.warn("Charge audio error:", e));
+      }
+    }
+  }
+});
+
+canvas.addEventListener("mouseup", e => {
+  if (e.button === 0) mouseLeftDown = false;
+  if (e.button === 2) {
+  if (useMouseControl && isCharging) {
+    const chargeTime = (Date.now() - chargeStartTime) / 1000;
+    fireXbuster(chargeTime);
+    isCharging = false;
+
+    // ✅ Dừng cả 2 âm thanh charge và loop
+    const chargeAudio = document.getElementById("charge");
+    chargeAudio.pause();
+    chargeAudio.currentTime = 0;
+
+    const loopAudio = document.getElementById("chargeloop");
+    loopAudio.pause();
+    loopAudio.currentTime = 0;
+    chargeLoopPlaying = false;
+  }
+  mouseRightDown = false;
+}
+});
+
+canvas.addEventListener("contextmenu", e => e.preventDefault()); // Ngăn menu chuột phải
+
+canvas.addEventListener("mousemove", (e) => {
+  if (!useMouseControl) return;
+  const rect = canvas.getBoundingClientRect();
+  const mouseX = e.clientX - rect.left;
+  const mouseY = e.clientY - rect.top;
+  player.x = mouseX - player.width / 2;
+  player.y = mouseY - player.height / 2;
+});
+
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    paused = !paused;
+    document.getElementById("pauseMenu").style.display = paused ? "block" : "none";
+    if (!paused) gameLoop();
+  }
+
+  if (e.key === "c") autoShoot = !autoShoot;
+
+  keys[e.key] = true;
+
+  if (e.key === "z" && !isCharging) {
+    isCharging = true;
+    chargeStartTime = Date.now();
+
+    chargeAudio.pause();             // đảm bảo reset trước
+    chargeAudio.currentTime = 0;
+
+    // 🎵 Phát tiếng charge ban đầu
+    chargeAudio.play().catch(e => console.warn("Charge sound error:", e));
+
+    // 🔇 Chuẩn bị chargeloop
+    loopAudio.pause();
+    loopAudio.currentTime = 0;
+    chargeLoopPlaying = false;
+  }
+});
+
+
+document.addEventListener("keyup", (e) => {
+  keys[e.key] = false;
+
+  if (e.key === "z" && isCharging) {
+    isCharging = false;
+
+    const chargeTime = (Date.now() - chargeStartTime) / 1000;
+    fireXbuster(chargeTime);
+
+    chargeAudio.pause();
+    chargeAudio.currentTime = 0;
+    chargeAudio.load();
+
+    loopAudio.pause();
+    loopAudio.currentTime = 0;
+    chargeLoopPlaying = false;
+  }
+});
+
+
+
+
+// Chỉ cần một lần gán sự kiện cho actionButton
+actionButton.addEventListener("click", () => {
+  if (!gameStarted || gameOver) {
+    gameStarted = true;
+    gameOver = false;
+    resetGame();
+    startGameLoop();    // BẮT BUỘC phải gọi vòng lặp game
+    canvas.focus();
+
+  }
+});
+
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,131 @@
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #70c5ce;
+    background-image: url("anh.jpg");
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Container chính giữa và nằm trên cùng */
+.container {
+    width: max-content;
+    margin: 20px auto;
+    position: relative;
+}
+
+/* Thanh menu chính */
+.nav {
+    list-style: none;
+    display: flex;
+    padding: 0;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(242, 250, 91, 0.826);
+    background-color: rgb(225, 55, 55);
+    position: relative;
+    z-index: 10;
+}
+
+.nav>li {
+    position: relative;
+    padding: 10px 30px;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.nav>li:hover {
+    background-color: rgb(220, 50, 195);
+    box-shadow: 0 4px 12px rgba(102, 85, 208, 0.3);
+}
+
+.nav>li>a {
+    color: rgb(3, 184, 244);
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+/* Sub-menu cấp 1 */
+.sub-menu {
+    list-style: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: rgb(195, 237, 69);
+    border-radius: 8pxrgb(226, 54, 83);
+    box-shadow: 0 4px 10px rgba(69, 137, 225, 0.2);
+    padding: 0;
+    margin: 0;
+    display: none;
+    min-width: 180px;
+    z-index: 9;
+    font-size: 20px;
+}
+
+.nav>li:hover>.sub-menu {
+    display: block;
+}
+
+.sub-menu>li {
+    padding: 10px 20px;
+    position: relative;
+    white-space: nowrap;
+    transition: background-color 0.3s;
+}
+
+.sub-menu>li:hover {
+    background-color: rgb(103, 241, 154);
+}
+
+/* Sub-menu cấp 2 */
+.sub-menu2 {
+    list-style: none;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    background-color: rgb(76, 234, 234);
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 0;
+    margin: 0;
+    display: none;
+    min-width: 150px;
+    z-index: 8;
+}
+
+.ruBik:hover>.sub-menu2 {
+    display: block;
+}
+
+.sub-menu2>li {
+    padding: 10px 20px;
+    white-space: nowrap;
+    transition: background-color 0.3s;
+}
+
+.sub-menu2>li:hover {
+    background-color: dimgrey;
+}
+
+/* Hover link */
+a:hover {
+    color: rgb(66, 160, 242);
+}
+
+/* Bo góc đầu/cuối (tùy chọn) */
+.nav>li:first-child {
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+
+.nav>li:last-child {
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+canvas {
+  background-color: #222;
+  border: 2px solid #fff;
+}

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>🚽 Skibidi Toilet Clicker 🚽</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="game-container">
+    <h1>🚽 Skibidi Toilet Clicker 🚽</h1>
+
+    <div class="stats">
+        <p>💰 Tiền: <span id="money">0</span></p>
+        <p>💪 Sức click: <span id="power">1</span></p>
+        <p>🤖 Auto click: <span id="auto">0</span>/giây</p>
+        <p>⚡ Sức auto click: <span id="autoPower">1</span></p>
+        <p>🔥 Boost: <span id="boost-status">Tắt</span></p>
+    </div>
+
+    <div class="click-area">
+        <img src="images/NormalSkibidi.png" id="toilet" alt="Skibidi Toilet">
+    </div>
+
+    <div class="shop">
+        <h2>🏪 Cửa hàng</h2>
+        <button id="upgradeClick">
+            Tăng sức click (<span id="clickPrice">50</span>💰)
+        </button>
+        <button id="buyAuto">
+            Mua Auto Click (<span id="autoPrice">200</span>💰)
+        </button>
+
+        <!-- ID và span name phải khớp với script.js -->
+        <button id="upgradeAutoPower" style="display:none;">
+            Nâng cấp Auto Click (<span id="autoPowerPrice">300</span>💰)
+        </button>
+
+        <button id="boost">Boost x2 (1000💰)</button>
+    </div>
+
+    <div class="skins">
+        <h2>🎭 Skins</h2>
+        <div id="skinList"></div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

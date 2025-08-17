@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<style>
+    @keyframes slideDown{
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    h2, p {
+    font-family: "vpshanoi", sans-serif;
+    font-weight: bold;
+    }
+    body {
+        font-family: "vpshanoi", sans-serif;
+        background-color: lightcyan;
+        text-align: center;
+    }
+    .login-contain {
+        margin-top: 50px;
+        background-color: white;
+        padding: 30px;
+        width: 300px;
+        margin-left: auto;
+        margin-right: auto;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px gray;
+        animation: slideDown 0.5s ease-in-out;
+    }
+    .input-group {
+        position: relative;
+        margin: 15px 0;
+    }
+    input {
+        width: 90%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid gray;
+        border-radius: 5px;
+        font-size: 16px;
+        transition: all 0.3s ease-in-out;
+    }
+    input:focus {
+        border-color: orangered;
+        box-shadow: 0 0 5px orangered;
+    }
+
+    button {
+        width: 10;
+        padding: 10px;
+        background-color: orangered;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.3s ease-in-out;
+    }
+    button:hover {
+        background-color: brown;
+    }
+    .toggle-password {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        font-size: 16px;
+    }
+</style>
+<body>
+    <h2>Thông tin Đăng nhập</h2>
+    <p>Vui lòng nhập thông tin người dùng</p>
+<div class="login-contain">
+    <h3>ĐĂNG NHẬP</h3>   
+    <div class="input-group">
+        <input type="text" id="username" placeholder="User name">
+    </div>
+    <div class="input-group">
+        <input type="password" id="password" placeholder="Password">
+        <span class="toggle-password" onclick="togglePassword()"></span>
+    </div>    
+    <button onclick="login()">Đăng nhập</button>
+    </div>
+    <script>
+        function login() {
+            let user = document.getElementById("username").value;
+            let pass = document.getElementById("password").value;
+
+            if (user === "admin" && pass === "123456") {
+                alert("Đăng nhập thành công!");
+                window.location.href = "TrangChu.html";
+            } else {
+                alert("Sai thông tin đăng nhập, thử lại!");
+            }
+        }
+    </script>
+
+</body>
+</html>

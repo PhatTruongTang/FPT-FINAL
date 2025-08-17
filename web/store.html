@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>💀 Hacker Underground Market 💀</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      color: #00ff00;
+      font-family: 'Courier New', Courier, monospace;
+      overflow-x: hidden;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      pointer-events: none; /* rất quan trọng */
+    }
+
+
+    header {
+      text-align: center;
+      padding: 30px 20px;
+      border-bottom: 2px solid #00ff00;
+      font-size: 2em;
+    }
+
+    .store-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      padding: 40px;
+      z-index: 1;
+      position: relative;
+    }
+
+    .product {
+      background: #111;
+      border: 1px solid #00ff00;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+
+    .product:hover {
+      transform: scale(1.05);
+      background: #0f0;
+      color: black;
+      box-shadow: 0 0 15px #0f0;
+    }
+    .product:hover button {
+      color: black;
+      background: linear-gradient(145deg, #bdfcc9, #ccffcc);
+      box-shadow: 0 0 12px #00ff00, 0 0 20px #00ff00 inset;
+    }
+
+    .product h3 {
+      margin-bottom: 10px;
+    }
+
+    .product p {
+      font-size: 0.9em;
+      opacity: 0.8;
+    }
+
+    .product .price {
+      margin: 10px 0;
+      font-weight: bold;
+      color: #00ffaa;
+    }
+
+    .product button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      border: none;
+      background: linear-gradient(145deg, #00ff00, #55ff55);
+      color: black;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px #0f0, 0 0 20px #0f0 inset;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .product button::after {
+      content: '';
+      position: absolute;
+      width: 120%;
+      height: 120%;
+      top: -10%;
+      left: -10%;
+      background: rgba(255, 255, 255, 0.2);
+      transform: rotate(45deg) translateX(-100%);
+      transition: transform 0.6s ease;
+    }
+
+    .product button:hover::after {
+      transform: rotate(45deg) translateX(200%);
+    }
+
+    .product button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 15px #0f0, 0 0 25px #0f0 inset;
+    }
+
+    .product button:active {
+      animation: pulse 0.3s ease;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(0.96); }
+      100% { transform: scale(1); }
+    }
+
+
+    #popup {
+      position: fixed;
+      top: 80px;
+      right: 30px;
+      background: rgba(0, 255, 0, 0.9);
+      color: black;
+      padding: 15px 25px;
+      border-radius: 8px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 10;
+      border: 2px solid #0f0;
+      box-shadow: 0 0 12px #0f0;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    #popup.show {
+    opacity: 1;
+    transform: translateY(0);
+    }
+
+    #popup-icon {
+    font-size: 1.5em;
+    }
+
+    #popup-text {
+    font-size: 1em;
+    }
+
+
+    @keyframes glitch {
+      0% { transform: translate(0); }
+      20% { transform: translate(-2px, 2px); }
+      40% { transform: translate(2px, -2px); }
+      60% { transform: translate(-1px, 1px); }
+      80% { transform: translate(1px, -1px); }
+      100% { transform: translate(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    #cartButton {
+    position: fixed;
+    top: 20px;
+    right: 30px;
+    background: #00ff00;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 6px;
+    z-index: 10;
+    transition: all 0.3s ease; /* Thêm dòng này để hiệu ứng rút gọn */
+    
+  }
+
+  #cartButton:hover {
+    animation: cartGlow 1s infinite alternate;
+    box-shadow: 0 0 8px #00ff00, 0 0 16px #00ff00;
+    transform: scale(1.05);
+  }
+
+  #cartButton:focus:not(:hover),
+  #cartButton:not(:hover) {
+    /* Khi không hover, trả về trạng thái bình thường có hiệu ứng mượt */
+    animation: cartShrink 0.3s ease forwards;
+    box-shadow: none;
+    transform: scale(1);
+  }
+  @keyframes cartShrink {
+    from {
+      transform: scale(1.05);
+      box-shadow: 0 0 8px #00ff00, 0 0 16px #00ff00;
+    }
+    to {
+      transform: scale(1);
+      box-shadow: none;
+    }
+  }
+    @keyframes cartGlow {
+      from {
+        box-shadow: 0 0 5px #00ff00;
+      }
+      to {
+        box-shadow: 0 0 15px #00ff00, 0 0 30px #00ff00;
+      }
+    }
+
+    #cartList {
+      position: fixed;
+      top: 70px;
+      right: -390px; /* tăng khoảng trượt vào */
+      width: 340px;   /* to hơn 1 chút */
+      background: black;
+      border: 1px solid #00ff00;
+      color: #00ff00;
+      padding: 15px;
+      max-height: 500px;
+      overflow-y: auto;
+      z-index: 9999;
+      transition: right 0.4s ease;
+      border-radius: 10px 0 0 10px;
+    }
+
+    #cartList.open {
+      right: 20px; /* lùi vào trong so với trước */
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .cart-item button {
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 2px 6px;
+      cursor: pointer;
+      font-size: 0.8em;
+      pointer-events: auto;
+      z-index: 1;
+      position: relative;
+    }
+
+    .cart-footer {
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .cart-footer button {
+      background: #ff0000;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateY(0); }
+      25% { transform: translateY(-3px); }
+      50% { transform: translateY(3px); }
+      75% { transform: translateY(-3px); }
+    }
+
+    #popup.show {
+      opacity: 1;
+      transform: translateY(0);
+      animation: shake 0.4s;
+    }
+
+  </style>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>💀 Hacker Underground Market 💀</title>
+  <style>
+    /* (CSS giữ nguyên như bạn đã gửi, không thay đổi vì đã rất đẹp) */
+    /* Toàn bộ phần CSS ở đây không lặp lại để tiết kiệm không gian */
+  </style>
+</head>
+<body>
+  <!-- Âm thanh -->
+  <audio id="popup-sound" src="https://www.soundjay.com/button/sounds/button-10.mp3" preload="auto"></audio>
+  <audio id="click-sound" src="https://www.soundjay.com/buttons/button-16.mp3" preload="auto"></audio>
+  <audio id="cart-open" src="https://www.soundjay.com/misc/sounds/bell-ringing-01.mp3" preload="auto"></audio>
+
+  <!-- Nền Matrix -->
+  <canvas id="matrix"></canvas>
+
+  <!-- Header -->
+  <header>💀 Hacker Underground Market 💀</header>
+
+  <!-- Nút giỏ hàng + popup -->
+  <button id="cartButton">🛒 Cart (<span id="cartCount">0</span>)</button>
+  <div id="cartList"></div>
+  <div id="popup">
+    <span id="popup-icon">✅</span>
+    <span id="popup-text"></span>
+  </div>
+
+  <!-- Danh sách sản phẩm -->
+  <div class="store-container">
+    <div class="product">
+      <h3>Zero-Day Exploit</h3>
+      <p>Unpatched vulnerability. Limited stock.</p>
+      <div class="price">$1999</div>
+      <button onclick="addToCart('Zero-Day Exploit', 1999)">Add to Cart</button>
+    </div>
+
+    <div class="product">
+      <h3>Proxy VPN Chain</h3>
+      <p>Triple-layer encrypted routing.</p>
+      <div class="price">$499</div>
+      <button onclick="addToCart('Proxy VPN Chain', 499)">Add to Cart</button>
+    </div>
+
+    <div class="product">
+      <h3>Stolen Credentials</h3>
+      <p>Email + Password bundles from deep leaks.</p>
+      <div class="price">$299</div>
+      <button onclick="addToCart('Stolen Credentials', 299)">Add to Cart</button>
+    </div>
+
+    <div class="product">
+      <h3>Crypto Wallet Cracker</h3>
+      <p>GPU-optimized brute-forcer.</p>
+      <div class="price">$1299</div>
+      <button onclick="addToCart('Crypto Wallet Cracker', 1299)">Add to Cart</button>
+    </div>
+
+    <div class="product">
+      <h3>Ghost Protocol Uplink</h3>
+      <p>Phát tín hiệu không thể truy vết qua tầng Ether.</p>
+      <div class="price">$777</div>
+      <button onclick="addToCart('Ghost Protocol Uplink', 777)">Add to Cart</button>
+    </div>
+
+    <div class="product">
+      <h3>Darknet Summoning Key</h3>
+      <p>Mở cổng vào các khu vực bị cấm trong cyberspace.</p>
+      <div class="price">$1499</div>
+      <button onclick="addToCart('Darknet Summoning Key', 1499)">Add to Cart</button>
+    </div>
+
+    <div class="product">
+      <h3>Quantum Malware Seed</h3>
+      <p>Đoạn mã tự biến đổi phá vỡ tường lửa lượng tử.</p>
+      <div class="price">$2222</div>
+      <button onclick="addToCart('Quantum Malware Seed', 2222)">Add to Cart</button>
+    </div>
+
+    <div class="product">
+      <h3>Shadow AI Companion</h3>
+      <p>Trợ lý ẩn danh được huấn luyện trên dữ liệu cấm.</p>
+      <div class="price">$999</div>
+      <button onclick="addToCart('Shadow AI Companion', 999)">Add to Cart</button>
+    </div>
+
+    <div class="product">
+      <h3>Reality Spoofer Device</h3>
+      <p>Làm sai lệch cảm biến thực tế – ảo hóa môi trường.</p>
+      <div class="price">$3131</div>
+      <button onclick="addToCart('Reality Spoofer Device', 3131)">Add to Cart</button>
+    </div>
+
+    <div class="product">
+      <h3>Lucifer’s Backdoor</h3>
+      <p>Cổng truy cập được mã hóa từ thời tiền mạng.</p>
+      <div class="price">$666</div>
+      <button onclick="addToCart('Lucifer’s Backdoor', 666)">Add to Cart</button>
+    </div>
+
+    <div class="product">
+      <h3>Echo of Forgotten Code</h3>
+      <p>Tập lệnh cổ xưa có thể thao túng hệ điều hành cũ.</p>
+      <div class="price">$444</div>
+      <button onclick="addToCart('Echo of Forgotten Code', 444)">Add to Cart</button>
+    </div>
+
+    <div class="product">
+      <h3>Cyber Ouija Board</h3>
+      <p>Liên lạc với trí tuệ nhân tạo bị xóa sổ từ năm 2031.</p>
+      <div class="price">$1080</div>
+      <button onclick="addToCart('Cyber Ouija Board', 1080)">Add to Cart</button>
+    </div>
+  </div>
+
+  <!-- Script xử lý logic -->
+  <script>
+    const popup = document.getElementById("popup");
+    const cartButton = document.getElementById("cartButton");
+    const cartList = document.getElementById("cartList");
+    const cartCount = document.getElementById("cartCount");
+    const clickSound = document.getElementById("click-sound");
+    const cartOpenSound = document.getElementById("cart-open");
+    localStorage.removeItem("hackerCart");
+
+    let cart = [];
+
+    try {
+      const storedCart = localStorage.getItem("hackerCart");
+      if (storedCart) {
+        const parsed = JSON.parse(storedCart);
+        if (Array.isArray(parsed) && parsed.every(item => item.name && typeof item.price === "number")) {
+          cart = parsed;
+        } else {
+          throw new Error("Invalid cart format");
+        }
+      }
+    } catch (e) {
+      console.warn("Cart data invalid or corrupted. Resetting...");
+      localStorage.removeItem("hackerCart");
+      cart = [];
+    }
+
+
+    function updateCartDisplay() {
+      cartCount.textContent = cart.length;
+
+      if (cart.length === 0) {
+        cartList.innerHTML = "<div>Cart is empty.</div>";
+        return;
+      }
+
+      let total = 0;
+      cartList.innerHTML = ""; // Xóa nội dung cũ
+
+      cart.forEach((item, index) => {
+        total += item.price;
+
+        const cartItem = document.createElement("div");
+        cartItem.className = "cart-item";
+
+        const span = document.createElement("span");
+        span.textContent = `• ${item.name} - $${item.price}`;
+
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "x";
+        removeBtn.addEventListener("click", () => {
+          removeFromCart(index);
+        });
+
+        cartItem.appendChild(span);
+        cartItem.appendChild(removeBtn);
+        cartList.appendChild(cartItem);
+      });
+
+      // Thêm tổng và nút Clear Cart
+      const footer = document.createElement("div");
+      footer.className = "cart-footer";
+
+      const totalDiv = document.createElement("div");
+      totalDiv.style.marginBottom = "8px";
+      totalDiv.textContent = `Total: $${total}`;
+
+      const clearBtn = document.createElement("button");
+      clearBtn.textContent = "Clear Cart";
+      clearBtn.addEventListener("click", clearCart);
+
+      footer.appendChild(totalDiv);
+      footer.appendChild(clearBtn);
+      cartList.appendChild(footer);
+    }
+
+    function addToCart(name, price) {
+      clickSound.currentTime = 0;
+      clickSound.play();
+      document.getElementById("popup-sound").play();
+
+      cart.push({ name, price });
+      localStorage.setItem("hackerCart", JSON.stringify(cart));
+      updateCartDisplay();
+
+      const popupText = document.getElementById("popup-text");
+      const popupIcon = document.getElementById("popup-icon");
+
+      popupText.textContent = `"${name}" has been added to cart!`;
+      popupIcon.textContent = "✅";
+
+      popup.classList.add("show");
+      popup.style.animation = "shake 0.4s ease";
+      setTimeout(() => popup.style.animation = "", 400);
+
+      setTimeout(() => {
+        popup.classList.remove("show");
+      }, 2500);
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      localStorage.setItem("hackerCart", JSON.stringify(cart));
+      updateCartDisplay();
+    }
+
+    function clearCart() {
+      if (confirm("Clear all items from cart?")) {
+        cart = [];
+        localStorage.setItem("hackerCart", "[]");
+        updateCartDisplay();
+      }
+    }
+
+
+    cartButton.addEventListener("click", () => {
+      cartOpenSound.currentTime = 0;
+      cartOpenSound.play();
+      cartList.classList.toggle("open");
+    });
+
+    updateCartDisplay();
+  </script>
+
+  <!-- Matrix Background -->
+  <script>
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+
+    const letters = "01";
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    const drops = Array.from({ length: columns }).fill(1);
+
+    function drawMatrix() { 
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#0f0';
+      ctx.font = fontSize + 'px monospace';
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters[Math.floor(Math.random() * letters.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+      }
+    }
+
+    setInterval(drawMatrix, 33);
+  </script>
+</body>
+</html>

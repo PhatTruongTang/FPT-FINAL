@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Công Nghệ Thông Tin</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        h1 {
+            color: #ff6600;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .item {
+            width: 250px;
+            margin: 15px;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+        }
+        .item img {
+            width: 100%;
+            border-radius: 10px;
+            transition: transform 0.3s ease-in-out;
+        }
+        .item:hover img {
+            transform: scale(1.1);
+        }
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 40%;
+            height:30%;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .item:hover .overlay {
+            opacity: 1;
+        }
+        .item p {
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        p {
+            font-family: "vpshanoi", sans-serif;
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        function loadPage(page) {
+            fetch(page)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("content").innerHTML = data;
+            })
+            .catch(error => console.error("Lỗi khi tải trang:", error));
+        }
+    </script>
+</head>
+<body>
+
+    <h1>CÔNG NGHỆ THÔNG TIN</h1>
+    <p>Trang giới thiệu về các ngành trong Công Nghệ Thông Tin</p>
+
+    <div class="container">
+        <div class="item" onclick="loadPage('LapTrinhWeb.html')">
+            <img src="https://caodang.fpt.edu.vn/wp-content/uploads/LapTrinhWebsite1200x628-580x386.png" alt="Lập trình Web">
+            <div class="overlay">START NOW</div>
+            <p>LẬP TRÌNH WEB</p>
+        </div>
+
+        <div class="item" onclick="loadPage('PhanMem.html')">
+            <img src="https://caodang.fpt.edu.vn/wp-content/uploads/PhatTrienPhanMem1200x628-580x386.png" alt="Phát triển phần mềm">
+            <div class="overlay">START NOW</div>
+            <p>PHÁT TRIỂN PHẦN MỀM</p>
+        </div>
+    </div>
+
+    <div id="content">
+        <p>Hãy chọn một ngành để xem chi tiết...</p>
+    </div>
+
+</body>
+</html>

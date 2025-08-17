@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Neon Shooter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Game Over overlay */
+    #gameOverScreen {
+      position: fixed;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      background: transparent;
+    }
+    #gameOverScreen h2 { display: none !important; }
+    #gameOverScreen #menuBtn {
+      background: rgba(0,255,255,.05);
+      border: 1px solid rgba(0,255,255,.3);
+      color: #bff;
+      padding: 12px 32px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 18px;
+      min-width: 160px;
+      cursor: pointer;
+      transition: .2s;
+      margin-top: 150px;
+    }
+    #gameOverScreen #menuBtn:hover {
+      background: rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
+<body>
+  <!-- Game Canvas -->
+  <canvas id="c"></canvas>
+
+  <!-- HUD -->
+  <div id="ui"></div>
+  <div id="hud-players"></div>
+  <div id="credits"></div>
+
+  <!-- Menu Overlay -->
+  <div id="menu">
+    <div class="wrapper">
+      <h1>NEON SHOOTER</h1>
+      <div id="totalPoints">Points: 0</div>
+
+      <!-- Chọn Skin -->
+      <h4>Skin</h4>
+      <div class="skin-chooser">
+        <div data-skin="0" class="skin-swatch sel"></div>
+        <div data-skin="1" class="skin-swatch"></div>
+        <div data-skin="2" class="skin-swatch"></div>
+      </div>
+
+      <!-- Chọn Map -->
+      <h4>Map</h4>
+      <div class="map-chooser">
+        <div data-map="0" class="map-thumb sel">Map 0</div>
+        <div data-map="1" class="map-thumb">Map 1</div>
+        <div data-map="2" class="map-thumb">Map 2</div>
+      </div>
+
+      <!-- Chế độ chơi -->
+      <h4>Mode</h4>
+      <label><input type="radio" name="mode" value="single" checked> Single</label>
+      <label><input type="radio" name="mode" value="coop"> Co-op</label>
+
+      <!-- Test Audio -->
+      <h4>Test Audio</h4>
+      <button onclick="audio.sfx('playerShot')">🔊 Test Player Shot</button>
+      <button onclick="audio.explosion('big')">💥 Test Explosion</button>
+
+      <!-- Shop -->
+      <div id="shop"></div>
+
+      <!-- Menu buttons -->
+      <div class="menu-buttons">
+        <button id="startBtn">START GAME</button>
+        <button id="restartBtn">RESTART</button>
+        <button id="tutorialBtn">TUTORIAL</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Over Screen -->
+  <div id="gameOverScreen">
+    <button id="menuBtn">Menu</button>
+  </div>
+
+  <!-- Thông báo -->
+  <div id="notify"></div>
+
+  <!-- Scripts -->
+  <script src="audio_explosion_advanced.js"></script>
+  <script src="main_neon_fixed_menu_button_full_WEAPONS.js"></script>
+  <script>
+    // Khi load trang → thử autoplay BGM Menu
+    window.addEventListener("load", () => {
+      console.log("%c[HTML] 📂 Trang đã load, thử autoplay BGM menu...", "color:cyan");
+      if (window.audio?.tryAutoplayMenu) {
+        audio.tryAutoplayMenu();
+      }
+    });
+
+    // Start Game
+    document.getElementById('startBtn').addEventListener('click', async () => {
+      if (window.audio?.unlock) {
+        await audio.unlock();
+        audio.toGame();
+      }
+      document.body.classList.add('playing');
+      document.getElementById('gameOverScreen').style.display = 'none';
+    });
+
+    // Menu Button
+    document.getElementById('menuBtn').addEventListener('click', () => {
+      if (typeof window.returnToMenu === 'function') {
+        window.returnToMenu();
+      }
+      document.getElementById('gameOverScreen').style.display = 'none';
+    });
+  </script>
+</body>
+</html>

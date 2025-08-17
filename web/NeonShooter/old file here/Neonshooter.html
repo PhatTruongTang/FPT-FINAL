@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Neon Shooter</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <!-- Canvas -->
+  <canvas id="c"></canvas>
+
+  <!-- UI HUD -->
+  <div id="ui"></div>
+  <div id="credits">Neon Shooter • P pause • R restart</div>
+  <div id="hud-players"></div>
+
+  <!-- Menu -->
+  <div id="menu"> 
+    <div class="card" id="menuCard">
+      <h1 style="margin:0 0 6px; font-size:28px; color:#9ff;">Neon Shooter</h1>
+      <div class="muted">Choose your mode and start playing</div>
+
+      <!-- Mode -->
+      <div style="margin-top:12px;">
+        <label><input type="radio" name="mode" value="single" checked> Single Player</label>
+        <label><input type="radio" name="mode" value="coop"> Co-op</label>
+      </div>
+
+      <!-- Skins -->
+      <div style="margin-top:12px; text-align:left;">
+        <div style="font-weight:700; color:#cfe;">Choose Ship Skins</div>
+        <div class="row" style="margin-top:8px;">
+          <div class="skin-swatch sel" data-skin="0" style="background:linear-gradient(90deg,#1ef,#8af);"></div>
+          <div class="skin-swatch" data-skin="1" style="background:linear-gradient(90deg,#ff7b7b,#ffdd66);"></div>
+          <div class="skin-swatch" data-skin="2" style="background:linear-gradient(90deg,#a7f,#4ff);"></div>
+          <div class="skin-swatch" data-skin="3" style="background:linear-gradient(90deg,#7fffcf,#5fc);"></div>
+        </div>
+
+        <!-- Map -->
+        <div style="margin-top:12px; font-weight:700; color:#cfe;">Choose Map</div>
+        <div class="row">
+          <div class="map-thumb sel" data-map="0" style="background:linear-gradient(180deg,#05010a,#090010);"></div>
+          <div class="map-thumb" data-map="1" style="background:linear-gradient(180deg,#0a050a,#150018);"></div>
+          <div class="map-thumb" data-map="2" style="background:linear-gradient(180deg,#001a2e,#002b46);"></div>
+        </div>
+      </div>
+
+      <!-- Upgrade Shop -->
+      <div style="margin-top:12px; font-weight:700; color:#cfe;">Upgrade Shop</div>
+      <div id="shop">
+        <button id="upgradeFireRate">Fire Rate + (Cost: 500)</button>
+        <button id="upgradeDamage">Bullet Damage + (Cost: 1000)</button>
+        <button id="unlockMissile">Unlock Missile (Cost: 2000)</button>
+        <button id="upgradeMissile">Upgrade Missile (Cost: 1500)</button>
+        <button id="unlockLaser">Unlock Laser (Cost: 5000)</button>
+        <button id="upgradeLaser">Upgrade Laser (Cost: 3000)</button>
+      </div>
+
+      <!-- Controls -->
+      <div class="small" id="controlsText">
+        Single: WASD + Mouse. Co-op: P1 WASD+Mouse, P2 Arrows + M (shoot), I (Laser), O (Missile).
+      </div>
+
+      <!-- Buttons -->
+      <div class="row" style="margin-top:14px;">
+        <button id="startBtn" class="sel">Start Game</button>
+        <button id="restartBtn">Restart</button>
+        <button id="tutorialBtn">Tutorial</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="audioManager.js" defer></script>
+  <script src="explosion.js" defer></script>
+  <script src="main.js" defer></script>
+
+</body>
+</html>

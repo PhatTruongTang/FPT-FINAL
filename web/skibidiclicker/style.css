@@ -1,0 +1,113 @@
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(270deg, #ffcc00, #ff6699, #66ccff);
+    background-size: 600% 600%;
+    animation: bgAnim 15s ease infinite;
+    text-align: center;
+    color: white;
+    margin: 0;
+}
+
+@keyframes bgAnim {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+}
+
+.game-container {
+    background: rgba(0,0,0,0.6);
+    padding: 20px;
+    border-radius: 15px;
+    margin: 40px auto;
+    max-width: 600px;
+}
+
+.click-area img {
+    width: 250px;
+    cursor: pointer;
+    transition: transform 0.1s, filter 0.3s;
+}
+
+.click-area img:active {
+    transform: scale(0.9) rotate(-5deg);
+    filter: drop-shadow(0 0 10px #ff0);
+}
+
+.shop button, .skin-btn {
+    margin: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #ffcc00;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.1s, background 0.3s;
+}
+
+.shop button:hover, .skin-btn:hover {
+    transform: scale(1.05);
+    background: #ffaa00;
+}
+
+.particle {
+    position: absolute;
+    font-weight: bold;
+    pointer-events: none;
+    animation: floatUp 1s ease-out forwards;
+}
+
+@keyframes floatUp {
+    0% {opacity: 1; transform: translateY(0);}
+    100% {opacity: 0; transform: translateY(-80px);}
+}
+
+.skin-btn {
+    display: inline-block;
+    margin: 5px;
+    padding: 5px;
+    background: #444;
+    color: white;
+}
+
+@keyframes shake {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(2px, -2px); }
+    50% { transform: translate(-2px, 2px); }
+    75% { transform: translate(2px, 2px); }
+    100% { transform: translate(0, 0); }
+}
+
+.shake {
+    animation: shake 0.2s;
+}
+.particle {
+    position: absolute;
+    pointer-events: none;
+    font-size: 20px;
+    font-weight: bold;
+    color: gold;
+    opacity: 1;
+    animation: floatUp 0.8s ease-out forwards;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -150%) scale(1.2);
+        opacity: 0;
+    }
+}
+
+/* CSS này bạn thêm vào file style.css */
+.toilet-zoom {
+    animation: toiletZoom 0.1s ease;
+}
+@keyframes toiletZoom {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Lab 52</title>
+  <link rel="stylesheet" href="GioHang2.css">
+</head>
+<body>
+    <h2>🛒 Hệ thống Giỏ Hàng</h2>
+
+    <div class="wrapper">
+      <!-- Bảng danh sách hàng hóa -->
+      <div style="flex: 1;">
+        <h3>DANH MỤC HÀNG HÓA</h3>
+        <table>
+          <tbody id="product-list">
+            <tr>
+              <td>iPhone9</td><td>$2700</td>
+              <td><button onclick="addToCart('iPhone9', 2700)">Thêm</button></td>
+            </tr>
+            <tr>
+              <td>Samsung Star</td><td>$1500</td>
+              <td><button onclick="addToCart('Samsung Star', 1500)">Thêm</button></td>
+            </tr>
+            <tr>
+              <td>Nokia 2020</td><td>$1200</td>
+              <td><button onclick="addToCart('Nokia 2020', 1200)">Thêm</button></td>
+            </tr>
+            <tr>
+              <td>Sony Xperia</td><td>$1700</td>
+              <td><button onclick="addToCart('Sony Xperia', 1700)">Thêm</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+  
+      <!-- Bảng giỏ hàng -->
+      <div style="flex: 1;">
+        <h3>GIỎ HÀNG CỦA BẠN</h3>
+        <table>
+          <tbody id="cart-list">
+            <!-- Hàng được thêm tại đây -->
+          </tbody>
+        </table>
+  
+        <div id="total" class="total">TỔNG SỐ TIỀN: $0</div>
+      </div>
+    </div>
+  
+    <script>
+      let totalAmount = 0;
+  
+      function addToCart(name, price) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${name}</td>
+          <td>$${price}</td>
+          <td><button onclick="removeFromCart(this, ${price})">Xóa</button></td>
+        `;
+        document.getElementById("cart-list").appendChild(row);
+        updateTotal(price, true);
+      }
+  
+      function removeFromCart(button, price) {
+        const row = button.parentElement.parentElement;
+        row.remove();
+        updateTotal(-price, false);
+      }
+  
+      function updateTotal(amount, added) {
+        totalAmount += amount;
+        const totalEl = document.getElementById("total");
+        totalEl.innerText = "TỔNG SỐ TIỀN: $" + totalAmount;
+  
+        if (added) {
+          totalEl.classList.add("highlight-add");
+        } else {
+          totalEl.classList.add("highlight-remove");
+        }
+  
+        setTimeout(() => {
+          totalEl.classList.remove("highlight-add", "highlight-remove");
+        }, 800);
+      }
+    </script>
+  
+</body>
+</html>

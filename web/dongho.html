@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Đồng Hồ Kỹ Thuật Số + Đếm Ngược</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand&display=swap" rel="stylesheet">
+  <style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+    body {
+        font-family: 'Quicksand', sans-serif;
+        background: linear-gradient(120deg, #d4fc79, #96e6a1);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        flex-direction: column;
+        transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+
+    .spinner {
+        border: 6px solid #e0e0e0;
+        border-top: 6px solid #27ae60;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 1s linear infinite;
+        margin-bottom: 12px;
+    }
+
+    .loading-text {
+        font-size: 1.4rem;
+        font-weight: bold;
+        font-family: 'Quicksand', sans-serif;
+        color: #2c3e50;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    #mainContent {
+        opacity: 0;
+        transition: opacity 0.8s ease;
+    }
+
+    .loaded .loading-screen {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .loaded #mainContent {
+        opacity: 1;
+    }
+
+    .container {
+        max-width: 960px;
+        margin: 20px auto;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    header {
+        background: linear-gradient(45deg, #2c3e50, #27ae60);
+        color: white;
+        height: 180px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #dongho {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 2.5rem;
+        letter-spacing: 3px;
+        cursor: pointer;
+        user-select: none;
+        transition: transform 0.2s;
+    }
+
+    #dongho:hover {
+        transform: scale(1.1);
+    }
+
+    #ngaythang {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+
+    main {
+        background: #ecf0f1;
+        padding: 40px;
+        text-align: center;
+    }
+
+    main button, input {
+        padding: 10px 16px;
+        font-size: 1rem;
+        border: none;
+        border-radius: 4px;
+        margin: 8px;
+    }
+
+    main button {
+        background: #3498db;
+        color: white;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    main button:hover {
+        background: #2980b9;
+    }
+
+    #countdown {
+        font-size: 2rem;
+        margin: 20px 0;
+        font-family: 'Orbitron', sans-serif;
+        color: #2c3e50;
+    }
+
+    footer {
+        background: #34495e;
+        color: white;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .input-time {
+        width: 60px;
+        text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="loading-screen" id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">Đang tải...</div>
+  </div>
+
+  <div class="container" id="mainContent">
+    <header>
+      <span id="dongho" onclick="startstopDH()">00:00:00</span>
+      <div id="ngaythang">--/--/----</div>
+    </header>
+    <main>
+      <div>
+        <label>Phút: <input class="input-time" id="inputPhut" type="number" min="0" value="5"></label>
+        <label>Giây: <input class="input-time" id="inputGiay" type="number" min="0" max="59" value="0"></label>
+        <button onclick="setCountdown()">Thiết lập thời gian</button>
+      </div>
+      <div id="countdown">05:00</div>
+      <button onclick="toggleCountdown()">Bắt đầu / Dừng đếm ngược</button>
+      <button onclick="resetCountdown()">Đặt lại đếm ngược</button>
+      <button onclick="location.reload()">Nạp lại</button>
+    </main>
+    <footer>
+      <p>© 2025 - Thiết kế bởi Phát</p>
+    </footer>
+  </div>
+
+  <script>
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.body.classList.add('loaded');
+      }, 800);
+    });
+
+    let dh = null;
+    function tg() {
+        const now = new Date();
+        const h = String(now.getHours()).padStart(2, '0');
+        const m = String(now.getMinutes()).padStart(2, '0');
+        const s = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById("dongho").innerText = `${h}:${m}:${s}`;
+    }
+    dh = setInterval(tg, 1000);
+    tg();
+
+    function startstopDH() {
+        if (dh === null) {
+            dh = setInterval(tg, 1000);
+        } else {
+            clearInterval(dh);
+            dh = null;
+        }
+    }
+
+    function hienNgayThang() {
+        const now = new Date();
+        const thu = ['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
+        const thuText = thu[now.getDay()];
+        const ngay = String(now.getDate()).padStart(2, '0');
+        const thang = String(now.getMonth() + 1).padStart(2, '0');
+        const nam = now.getFullYear();
+        document.getElementById("ngaythang").innerText = `${thuText}, ${ngay}/${thang}/${nam}`;
+    }
+    hienNgayThang();
+
+    let countdownTime = 300;
+    let countdownInterval = null;
+
+    function formatTime(seconds) {
+        const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+        const s = String(seconds % 60).padStart(2, '0');
+        return `${m}:${s}`;
+    }
+
+    function updateCountdownDisplay() {
+        document.getElementById("countdown").innerText = formatTime(countdownTime);
+    }
+
+    function toggleCountdown() {
+        if (countdownInterval === null) {
+            countdownInterval = setInterval(() => {
+                if (countdownTime > 0) {
+                    countdownTime--;
+                    updateCountdownDisplay();
+                } else {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                    alert("⏰ Hết giờ!");
+                }
+            }, 1000);
+        } else {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+        }
+    }
+
+    function resetCountdown() {
+        countdownTime = 300;
+        updateCountdownDisplay();
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+    }
+
+    function setCountdown() {
+        const phut = parseInt(document.getElementById("inputPhut").value) || 0;
+        const giay = parseInt(document.getElementById("inputGiay").value) || 0;
+        countdownTime = phut * 60 + giay;
+        updateCountdownDisplay();
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+    }
+
+    updateCountdownDisplay();
+  </script>
+</body>
+</html>

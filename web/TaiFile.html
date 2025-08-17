@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Upload File Đẹp + Tải</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    body {
+      background: #f0f4f8;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+    }
+    .wrapper {
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      width: 450px;
+    }
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+    label {
+      display: block;
+      margin-top: 20px;
+      font-weight: bold;
+      color: #555;
+    }
+    input[type="file"] {
+      margin-top: 10px;
+      padding: 10px;
+      border: 2px dashed #ccc;
+      border-radius: 10px;
+      background: #fafafa;
+      width: 100%;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    input[type="file"]:hover {
+      border-color: #007bff;
+      background: #f0f8ff;
+    }
+    p, ul {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #444;
+      padding-left: 20px;
+    }
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+    }
+    button.download-btn {
+      padding: 5px 10px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background 0.2s;
+    }
+    button.download-btn:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <h2>Upload 1 File</h2>
+    <label for="singleFile">Chọn file:</label>
+    <input type="file" id="singleFile" onchange="showSingleFileName()" />
+    <ul id="singleFileList"></ul>
+
+    <h2>Upload nhiều file</h2>
+    <label for="multipleFiles">Chọn nhiều file:</label>
+    <input type="file" id="multipleFiles" multiple onchange="showMultipleFileNames()" />
+    <ul id="multipleFileList"></ul>
+  </div>
+
+  <script>
+    function createDownloadButton(file) {
+      const blobUrl = URL.createObjectURL(file);
+      const button = document.createElement("button");
+      button.textContent = "Tải file";
+      button.className = "download-btn";
+      button.onclick = function () {
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = file.name;
+        a.click();
+        URL.revokeObjectURL(blobUrl); // Xóa URL tạm sau khi tải
+      };
+      return button;
+    }
+
+    function showSingleFileName() {
+      const file = document.getElementById("singleFile").files[0];
+      const list = document.getElementById("singleFileList");
+      list.innerHTML = "";
+      if (file) {
+        const li = document.createElement("li");
+        li.textContent = file.name;
+        li.appendChild(createDownloadButton(file));
+        list.appendChild(li);
+      }
+    }
+
+    function showMultipleFileNames() {
+      const files = document.getElementById("multipleFiles").files;
+      const list = document.getElementById("multipleFileList");
+      list.innerHTML = "";
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const li = document.createElement("li");
+        li.textContent = file.name;
+        li.appendChild(createDownloadButton(file));
+        list.appendChild(li);
+      }
+    }
+  </script>
+</body>
+</html>

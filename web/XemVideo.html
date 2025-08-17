@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bộ sưu tập video</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(120deg, #fceabb, #f8b500);
+      padding: 20px;
+      color: #2c3e50;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5rem;
+      color: #34495e;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .video-wrapper {
+      flex: 1 1 65%;
+      aspect-ratio: 16 / 9;
+      background-color: #000;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+
+    .video-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .sidebar {
+      flex: 1 1 30%;
+      max-height: 630px;
+      overflow-y: auto;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .video-thumb {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px;
+      background-color: white;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      transition: background-color 0.3s;
+    }
+
+    .video-thumb:hover {
+      background-color: #f1c40f;
+    }
+
+    .video-thumb img {
+      width: 100px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .video-thumb span {
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    @media screen and (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .video-wrapper {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+      }
+
+      .sidebar {
+        width: 100%;
+        max-height: 300px;
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+        flex-wrap: nowrap;
+      }
+
+      .video-thumb {
+        flex-direction: column;
+        min-width: 140px;
+        padding: 5px;
+        align-items: center;
+      }
+
+      .video-thumb img {
+        width: 100%;
+        height: 80px;
+      }
+
+      .video-thumb span {
+        font-size: 0.9rem;
+        text-align: center;
+      }
+    }
+
+    /* LOADING OVERLAY */
+    #loadingOverlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: white;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #2c3e50;
+      transition: opacity 1s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading overlay -->
+  <div id="loadingOverlay">🔄 Đang tải trang...</div>
+
+  <h1>Bộ sưu tập video 🎬</h1>
+
+  <div class="container">
+    <div class="video-wrapper">
+      <iframe name="videoFrame" src="video1.html" allowfullscreen></iframe>
+    </div>
+
+    <div class="sidebar">
+      <a class="video-thumb" href="video1.html" target="videoFrame">
+        <img src="../images/pickleball.avif" alt="Pickleball">
+        <span>Pickleball - Đỗ Phú Quí</span>
+      </a>
+      <a class="video-thumb" href="video2.html" target="videoFrame">
+        <img src="../images/gman.jpg" alt="G-Man">
+        <span>G-Man Trailer</span>
+      </a>
+      <a class="video-thumb" href="video3.html" target="videoFrame">
+        <img src="../images/tvman.jpg" alt="TV Man">
+        <span>TV Man Showdown</span>
+      </a>
+      <a class="video-thumb" href="video4.html" target="videoFrame">
+        <img src="../images/dregg.jpg" alt="Dregg">
+        <span>Dregg Awakens</span>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // Ẩn loading sau khi load xong
+    window.addEventListener('load', () => {
+      const overlay = document.getElementById("loadingOverlay");
+      overlay.style.opacity = '0';
+      setTimeout(() => overlay.remove(), 1000); // đợi 1s cho fade-out
+    });
+  </script>
+
+</body>
+</html>

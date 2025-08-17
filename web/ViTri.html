@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vị Trí Chi Tiết Của Bạn</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <style>
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(120deg, #d4fc79, #96e6a1);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .wrapper {
+      background: #ffffffcc;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 95%;
+      max-width: 1000px;
+      animation: fadeIn 1s ease;
+      margin-bottom: 20px;
+      position: relative; /* thêm dòng này để overlay định vị theo wrapper */
+
+    }
+    h2 {
+      color: #2c3e50;
+      margin-bottom: 15px;
+    }
+    button {
+      padding: 10px 20px;
+      background: #27ae60;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #1e8449;
+    }
+    #map {
+      height: 600px;
+      width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 15px;
+    }
+    #locationOutput, #weatherOutput, #addressOutput, #compassOutput {
+      margin-top: 15px;
+      color: #34495e;
+      font-size: 1.1rem;
+    }
+    #loadingOverlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #ffffffcc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      border-radius: 16px;
+    }
+
+    #loadingOverlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+    }
+    .spinner {
+      width: 50px; height: 50px;
+      border: 6px solid #d1f3d1;
+      border-top: 6px solid #27ae60;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    #miniLoading {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #ffffffcc;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      z-index: 9998;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.3s ease;
+    }
+    #miniLoading.hidden {
+      display: none;
+    }
+    .spinner.small {
+      width: 30px;
+      height: 30px;
+      border: 4px solid #d1f3d1;
+      border-top: 4px solid #27ae60;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+  </style>
+</head>
+<body>
+
+  
+  <div class="wrapper">
+      <div id="loadingOverlay"><div class="spinner"></div></div>
+  <div id="miniLoading" class="hidden">
+    <div class="spinner small"></div>
+  </div>
+
+    <h2>📍 Vị trí hiện tại của bạn</h2>
+    <button onclick="startTracking()">Bắt đầu theo dõi vị trí</button>
+    <div id="locationOutput"></div>
+    <div id="addressOutput"></div>
+    <div id="weatherOutput"></div>
+    <div id="compassOutput"></div>
+    <div id="map"></div>
+  </div>
+  <script>
+    let map, marker, circle;
+    const weatherAPIKey = "48f8b477716e7b1a6694a04d28b4e789";
+
+    window.addEventListener('load', () => {
+      map = L.map('map').setView([10.762622, 106.660172], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+      }).addTo(map);
+      document.getElementById("loadingOverlay").classList.add("hidden");
+    });
+
+    function startTracking() {
+      if (!navigator.geolocation) {
+        alert("Trình duyệt không hỗ trợ geolocation!");
+        return;
+      }
+
+      navigator.geolocation.watchPosition(updatePosition, showError, {
+        enableHighAccuracy: true,
+        maximumAge: 1000
+      });
+    }
+
+    function updatePosition(position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      const acc = position.coords.accuracy;
+      const heading = position.coords.heading;
+      const timestamp = new Date(position.timestamp).toLocaleTimeString();
+
+      document.getElementById("locationOutput").innerHTML =
+        `📍 Vĩ độ: <strong>${lat.toFixed(6)}</strong>, ` +
+        `Kinh độ: <strong>${lon.toFixed(6)}</strong><br>` +
+        `🎯 Độ chính xác: ${acc} m<br>` +
+        `🕒 Cập nhật: ${timestamp}`;
+
+      if (heading !== null) {
+        document.getElementById("compassOutput").innerHTML =
+          `🧭 Hướng di chuyển: <strong>${heading.toFixed(0)}°</strong>`;
+      }
+
+      if (marker) map.removeLayer(marker);
+      if (circle) map.removeLayer(circle);
+
+      marker = L.marker([lat, lon]).addTo(map).bindPopup("Bạn đang ở đây").openPopup();
+      circle = L.circle([lat, lon], { radius: acc }).addTo(map);
+      map.setView([lat, lon], 17);
+
+      const history = JSON.parse(sessionStorage.getItem("locationHistory") || "[]");
+      history.push({ lat, lon, time: timestamp });
+      sessionStorage.setItem("locationHistory", JSON.stringify(history));
+
+      // Thời tiết
+      fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${weatherAPIKey}&units=metric&lang=vi`)
+        .then(res => res.json())
+        .then(data => {
+          const temp = data.main.temp;
+          const desc = data.weather[0].description;
+          document.getElementById("weatherOutput").innerHTML =
+            `🌤 Thời tiết: <strong>${desc}</strong> - Nhiệt độ: <strong>${temp}°C</strong>`;
+        })
+        .catch(() => {
+          document.getElementById("weatherOutput").innerText = "Không thể tải dữ liệu thời tiết.";
+        });
+
+      // Địa chỉ
+      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`)
+        .then(res => res.json())
+        .then(data => {
+          const addr = data.address;
+          document.getElementById("addressOutput").innerHTML =
+            `🏡 Địa chỉ gần nhất: <strong>${addr.road || ''}, ${addr.suburb || ''}, ${addr.city || addr.town || addr.village || ''}, ${addr.state || ''}, ${addr.country || ''}</strong>`;
+        })
+        .catch(() => {
+          document.getElementById("addressOutput").innerText = "Không thể tải địa chỉ chi tiết.";
+        });
+    }
+
+    function showMiniLoading() {
+      document.getElementById("miniLoading").classList.remove("hidden");
+    }
+    function hideMiniLoading() {
+      document.getElementById("miniLoading").classList.add("hidden");
+    }
+
+    function updatePosition(position) {
+      showMiniLoading(); // 🟢 Bắt đầu loading nhỏ
+
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      const acc = position.coords.accuracy;
+      const heading = position.coords.heading;
+      const timestamp = new Date(position.timestamp).toLocaleTimeString();
+
+      document.getElementById("locationOutput").innerHTML =
+        `📍 Vĩ độ: <strong>${lat.toFixed(6)}</strong>, ` +
+        `Kinh độ: <strong>${lon.toFixed(6)}</strong><br>` +
+        `🎯 Độ chính xác: ${acc} m<br>` +
+        `🕒 Cập nhật: ${timestamp}`;
+
+      if (heading !== null) {
+        document.getElementById("compassOutput").innerHTML =
+          `🧭 Hướng di chuyển: <strong>${heading.toFixed(0)}°</strong>`;
+      }
+
+      if (marker) map.removeLayer(marker);
+      if (circle) map.removeLayer(circle);
+
+      marker = L.marker([lat, lon]).addTo(map).bindPopup("Bạn đang ở đây").openPopup();
+      circle = L.circle([lat, lon], { radius: acc }).addTo(map);
+      map.setView([lat, lon], 17);
+
+      const history = JSON.parse(sessionStorage.getItem("locationHistory") || "[]");
+      history.push({ lat, lon, time: timestamp });
+      sessionStorage.setItem("locationHistory", JSON.stringify(history));
+
+      // Thời tiết
+      fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${weatherAPIKey}&units=metric&lang=vi`)
+        .then(res => res.json())
+        .then(data => {
+          const temp = data.main.temp;
+          const desc = data.weather[0].description;
+          document.getElementById("weatherOutput").innerHTML =
+            `🌤 Thời tiết: <strong>${desc}</strong> - Nhiệt độ: <strong>${temp}°C</strong>`;
+        })
+        .catch(() => {
+          document.getElementById("weatherOutput").innerText = "Không thể tải dữ liệu thời tiết.";
+        })
+        .finally(() => {
+          hideMiniLoading(); // 🔴 Kết thúc loading mini sau khi fetch thời tiết
+        });
+
+      // Địa chỉ
+      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`)
+        .then(res => res.json())
+        .then(data => {
+          const addr = data.address;
+          document.getElementById("addressOutput").innerHTML =
+            `🏡 Địa chỉ gần nhất: <strong>${addr.road || ''}, ${addr.suburb || ''}, ${addr.city || addr.town || addr.village || ''}, ${addr.state || ''}, ${addr.country || ''}</strong>`;
+        })
+        .catch(() => {
+          document.getElementById("addressOutput").innerText = "Không thể tải địa chỉ chi tiết.";
+        });
+    }
+
+    function showError(error) {
+      const output = document.getElementById("locationOutput");
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          output.innerText = "Bạn đã từ chối cấp quyền vị trí.";
+          break;
+        case error.POSITION_UNAVAILABLE:
+          output.innerText = "Không thể lấy vị trí hiện tại.";
+          break;
+        case error.TIMEOUT:
+          output.innerText = "Yêu cầu lấy vị trí bị hết thời gian.";
+          break;
+        default:
+          output.innerText = "Lỗi không xác định.";
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+	"folders": [
+		{
+			"name": "CODE WEBSITE1043",
+			"path": "../.."
+		},
+		{
+			"name": "THANHTOAN",
+			"path": "../../../THANHTOAN"
+		},
+		{
+			"path": "../../../../WEB1013 - Xây dựng trang web/WEBSITE"
+		},
+		{
+			"path": "../../../GOI SV BUOI 6"
+		},
+		{
+			"path": "../../../GOI SV BUOI 4"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "CODE WEBSITE1043"
+	}
+}

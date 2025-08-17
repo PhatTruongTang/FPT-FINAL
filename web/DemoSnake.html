@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Snake Neon Edition</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
+    }
+
+    canvas {
+      background: #000;
+      border: 5px solid #00ff99;
+      box-shadow: 0 0 25px #00ff99, inset 0 0 10px #00ffcc;
+      animation: pulse 2s infinite alternate;
+      border-radius: 10px;
+    }
+
+    h1 {
+      font-size: 36px;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffaa;
+      animation: glow 3s infinite alternate;
+    }
+    
+    button {
+      margin-top: 10px;
+      padding: 8px 16px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      background: #33ffff;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 10px #33ffff;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      z-index: 10;
+    }
+
+    .hidden { display: none; }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-30px); opacity: 0; }
+    }
+
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 5px #00ffcc;
+      }
+      to {
+        text-shadow: 0 0 20px #00ffaa, 0 0 30px #00ffcc;
+      }
+    }
+
+    @keyframes pulse {
+      from {
+        box-shadow: 0 0 15px #00ff99, inset 0 0 5px #00ffcc;
+      }
+      to {
+        box-shadow: 0 0 35px #00ffcc, inset 0 0 15px #00ffaa;
+      }
+    }
+    .plus-one {
+      position: absolute;
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: bold;
+      pointer-events: none;
+      text-shadow: 0 0 10px #ff99cc, 0 0 20px #ff99cc;
+      animation: floatUp 1s ease-out forwards;
+    }
+  </style>
+</head>
+<body>
+  <h1>🐍 Snake Neon Edition</h1>
+  <canvas id="game" width="400" height="400"></canvas>
+  <button id="pauseBtn" class="btn">⏸ Pause</button>
+
+  <!-- Start Screen -->
+  <div id="startScreen" class="overlay">
+    <h2>Bấm bất kỳ phím nào để bắt đầu</h2>
+  </div>
+
+  <!-- Pause Menu -->
+  <div id="pauseMenu" class="overlay hidden">
+    <h2>⏸ Đã tạm dừng</h2>
+    <button id="resumeBtn" class="btn">▶ Tiếp tục</button>
+  </div>
+
+  <!-- Game Over Screen -->
+  <div id="gameOverScreen" class="overlay hidden">
+    <h2>💀 Game Over!</h2>
+    <p id="finalScore"></p>
+    <button id="restartBtn" class="btn">🔄 Chơi lại</button>
+  </div>
+
+  <!-- Thêm thẻ audio -->
+  <audio id="eatSound" src="../web/Snake/eatapple.mp3" preload="auto"></audio>
+  <audio id="deadSound" src="../web/Snake/dead.mp3" preload="auto"></audio>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const box = 20;
+    let score = 0;
+    let snake = [{ x: 9 * box, y: 10 * box }];
+    let direction = "RIGHT";
+    let nextDirection = "RIGHT";
+    let lastMove = 0;
+    const moveDelay = 120;
+    let food = generateFood();
+    let angle = 0;
+    let isPaused = false;
+    let isGameOver = false;
+    let isStarted = false;
+    
+    const eatSound = document.getElementById("eatSound");
+    const deadSound = document.getElementById("deadSound");
+    
+    const startScreen = document.getElementById("startScreen");
+    const pauseMenu = document.getElementById("pauseMenu");
+    const gameOverScreen = document.getElementById("gameOverScreen");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const resumeBtn = document.getElementById("resumeBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const finalScore = document.getElementById("finalScore");
+    
+    function resetGame() {
+      score = 0;
+      snake = [{ x: 9 * box, y: 10 * box }];
+      direction = "RIGHT";
+      nextDirection = "RIGHT";
+      lastMove = 0;
+      food = generateFood();
+      isPaused = false;
+      isGameOver = false;
+      isStarted = true;
+      gameOverScreen.classList.add("hidden");
+      requestAnimationFrame(updateGame);
+    }
+    
+    function generateFood() {
+      return {
+        x: Math.floor(Math.random() * (canvas.width / box)) * box,
+        y: Math.floor(Math.random() * (canvas.height / box)) * box
+      };
+    }
+    
+    function drawSnake() {
+      snake.forEach((segment, index) => {
+        const gradient = ctx.createLinearGradient(segment.x, segment.y, segment.x + box, segment.y + box);
+        gradient.addColorStop(0, index === 0 ? "#4caf50" : "#81c784");
+        gradient.addColorStop(1, "#2e7d32");
+        ctx.fillStyle = gradient;
+        ctx.shadowColor = "#a5d6a7";
+        ctx.shadowBlur = index === 0 ? 12 : 6;
+        ctx.fillRect(segment.x, segment.y, box, box);
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = "rgba(165, 214, 167, 0.5)";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(segment.x, segment.y, box, box);
+      });
+    }
+    
+    function drawFood() {
+      const centerX = food.x + box / 2;
+      const centerY = food.y + box / 2;
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.rotate(angle);
+      ctx.translate(-centerX, -centerY);
+    
+      ctx.fillStyle = "#ef5350";
+      ctx.strokeStyle = "#b71c1c";
+      ctx.lineWidth = 2;
+      ctx.fillRect(food.x, food.y, box, box);
+      ctx.strokeRect(food.x, food.y, box, box);
+    
+      const gradient = ctx.createRadialGradient(centerX, centerY, 2, centerX, centerY, box / 2);
+      gradient.addColorStop(0, "#ffcdd2");
+      gradient.addColorStop(1, "#c62828");
+      ctx.fillStyle = gradient;
+      ctx.shadowColor = "#ef9a9a";
+      ctx.shadowBlur = 10;
+      ctx.fillRect(food.x, food.y, box, box);
+    
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = "rgba(239, 154, 154, 0.5)";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(food.x, food.y, box, box);
+    
+      ctx.restore();
+      ctx.shadowBlur = 0;
+      angle += 0.05;
+    }
+    
+    function drawScore() {
+      ctx.fillStyle = "#ccffff";
+      ctx.font = "20px Segoe UI";
+      ctx.fillText("🎯 Điểm: " + score, 10, 25);
+    }
+    
+    function showPlusOne(x, y) {
+      const plus = document.createElement("div");
+      plus.className = "plus-one";
+      plus.style.left = canvas.offsetLeft + x + "px";
+      plus.style.top = canvas.offsetTop + y + "px";
+      plus.textContent = "+1 đuôi";
+      document.body.appendChild(plus);
+      setTimeout(() => plus.remove(), 1000);
+    }
+    
+    function drawGame() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawSnake();
+      drawFood();
+      drawScore();
+    }
+    
+    function updateGame(timestamp) {
+      if (!isStarted || isPaused || isGameOver) {
+        requestAnimationFrame(updateGame);
+        return;
+      }
+    
+      if (timestamp - lastMove > moveDelay) {
+        direction = nextDirection;
+        const head = { ...snake[0] };
+    
+        if (direction === "LEFT") head.x -= box;
+        if (direction === "RIGHT") head.x += box;
+        if (direction === "UP") head.y -= box;
+        if (direction === "DOWN") head.y += box;
+    
+        if (
+          head.x < 0 || head.x >= canvas.width ||
+          head.y < 0 || head.y >= canvas.height ||
+          snake.some((seg, i) => i !== 0 && seg.x === head.x && seg.y === head.y)
+        ) {
+          deadSound.play();
+          isGameOver = true;
+          finalScore.textContent = "Bạn đã đạt được " + score + " điểm!";
+          gameOverScreen.classList.remove("hidden");
+          return;
+        }
+    
+        if (head.x === food.x && head.y === food.y) {
+          score++;
+          food = generateFood();
+          showPlusOne(head.x + box / 2, head.y);
+          eatSound.play();
+        } else {
+          snake.pop();
+        }
+    
+        snake.unshift(head);
+        lastMove = timestamp;
+      }
+    
+      drawGame();
+      requestAnimationFrame(updateGame);
+    }
+    
+    // =====================
+    // 🔑 SỰ KIỆN BÀN PHÍM
+    // =====================
+    document.addEventListener("keydown", e => {
+      const key = e.key.toLowerCase();
+    
+      if (!isStarted) {
+        startScreen.classList.add("hidden");
+        isStarted = true;
+        requestAnimationFrame(updateGame);
+      }
+    
+      if (key === "escape") {
+        isPaused = !isPaused;
+        pauseMenu.classList.toggle("hidden", !isPaused);
+      }
+    
+      if ((key === "arrowleft" || key === "a") && direction !== "RIGHT") nextDirection = "LEFT";
+      else if ((key === "arrowup" || key === "w") && direction !== "DOWN") nextDirection = "UP";
+      else if ((key === "arrowright" || key === "d") && direction !== "LEFT") nextDirection = "RIGHT";
+      else if ((key === "arrowdown" || key === "s") && direction !== "UP") nextDirection = "DOWN";
+    });
+    
+    // Nút tạm dừng
+    pauseBtn.addEventListener("click", () => {
+      isPaused = !isPaused;
+      pauseMenu.classList.toggle("hidden", !isPaused);
+    });
+    
+    // Nút tiếp tục
+    resumeBtn.addEventListener("click", () => {
+      isPaused = false;
+      pauseMenu.classList.add("hidden");
+    });
+    
+    // Nút chơi lại
+    restartBtn.addEventListener("click", () => {
+      resetGame();
+    });
+    </script>
+
+</body>
+</html>

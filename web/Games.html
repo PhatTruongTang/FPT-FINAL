@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🎮 Danh Sách Trò Chơi</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    .game-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 1000px;
+    }
+
+    .game-box {
+      background: #fff;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      overflow: hidden;
+    }
+
+    .game-box:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .game-img {
+      width: 100%;
+      height: 50%;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      transition: transform 0.3s ease;
+    }
+
+    .game-box:hover .game-img {
+      transform: scale(1.03);
+    }
+
+    .game-box h2 {
+      font-size: 20px;
+      margin: 10px 0;
+      color: #444;
+    }
+
+    .game-box p {
+      font-size: 14px;
+      color: #777;
+      margin-bottom: 15px;
+    }
+
+    .play-btn {
+      padding: 10px 20px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .play-btn:hover {
+      background: #0056b3;
+      transform: scale(1.05);
+    }
+
+    .play-btn:active {
+      transform: scale(0.95);
+    }
+  </style>
+</head>
+<body>
+  <h1>🎮 Danh Sách Trò Chơi</h1>
+
+  <div class="game-container">
+    <!-- Game 1 -->
+    <div class="game-box">
+      <img src="../images/planeshooter.PNG" alt="Plane Shooter" class="game-img">
+      <h2>Plane Shooter</h2>
+      <p>🌟 Khuyên chơi thử! Bắn máy bay cực đỉnh, né đạn và nâng cấp vũ khí để sống sót càng lâu càng tốt.</p>
+      <button class="play-btn" onclick="window.location.href='PlaneShooterv2.html'">Chơi ngay</button>
+    </div>
+
+    <!-- Game 2 -->
+    <div class="game-box">
+      <img src="../images/snake.PNG" alt="Snake Eat" class="game-img">
+      <h2>Snake Eat</h2>
+      <p>Game rắn săn mồi huyền thoại! Ăn càng nhiều điểm càng dài và càng khó điều khiển.</p>
+      <button class="play-btn" onclick="window.location.href='DemoSnake.html'">Chơi ngay</button>
+    </div>
+
+    <!-- Game 3 -->
+    <div class="game-box">
+      <img src="../images/flappy.PNG" alt="Flappy Bird" class="game-img">
+      <h2>Flappy Bird</h2>
+      <p>Điều khiển chú chim vượt qua các ống nước. Nghe dễ nhưng cực kỳ thử thách!</p>
+      <button class="play-btn" onclick="window.location.href='Flappybird.html'">Chơi ngay</button>
+    </div>
+
+    <!-- Game 4 -->
+    <div class="game-box">
+      <img src="../images/Oddoneout.png" alt="Odd One Out" class="game-img">
+      <h2>Odd One Out</h2>
+      <p>Tìm điểm khác biệt trong thời gian giới hạn. Càng nhanh mắt, càng dễ chiến thắng.</p>
+      <button class="play-btn" onclick="window.location.href='../web/Oddoneoutgame/oddoneout.html'">Chơi ngay</button>
+    </div>
+
+    <!-- Game 5 -->
+    <div class="game-box">
+      <img src="../images/Piano.png" alt="Piano Tiles" class="game-img">
+      <h2>Piano Tiles</h2>
+      <p>Chạm đúng phím đàn đang rơi để tạo ra giai điệu hoàn hảo. Đừng bỏ lỡ nhịp!</p>
+      <button class="play-btn" onclick="window.location.href='../web/Pianogame/piano.html'">Chơi ngay</button>
+    </div>
+
+    <!-- Game 6 -->
+    <div class="game-box">
+      <img src="../images/Flappy Bird 2.png" alt="Flappy Bird 2" class="game-img">
+      <h2>Flappy Bird 2</h2>
+      <p>Phiên bản nâng cấp của Flappy Bird với độ khó cao hơn và nhiều thử thách mới.</p>
+      <button class="play-btn" onclick="window.location.href='../web/GAME/Game1.html'">Chơi ngay</button>
+    </div>
+
+    <!-- Game 7 -->
+    <div class="game-box">
+      <img src="../images/galaxy.png" alt="Neon Shooter" class="game-img">
+      <h2>Neon Shooter [WIP]</h2>
+      <p>Điều khiển phi thuyền vượt qua làn đạn dày đặc, tiêu diệt boss khổng lồ và chinh phục vũ trụ.</p>
+      <button class="play-btn" onclick="window.location.href='../web/NeonShooter/NeonShooter.html'">Chơi ngay</button>
+    </div>
+
+    <!-- Game 8 -->
+    <div class="game-box">
+      <img src="../images/skibidiclicker.png" alt="Skibidi Clicker Simulator" class="game-img">
+      <h2>Skibidi Clicker Simulator</h2>
+      <p>Click thật nhanh để thu thập Skibidi Toilet, nâng cấp và mở khóa nhiều nhân vật hài hước.</p>
+      <button class="play-btn" onclick="window.location.href='../web/Skibidiclicker/toilet.html'">Chơi ngay</button>
+    </div>
+  <!-- Game 4: Piano Tiles -->
+  <div class="game-box">
+    <img src="../images/piano.png" alt="Piano Tiles" class="game-img">
+    <h2>Piano Tiles</h2>
+    <p>Nhấn đúng phím đàn khi chúng rơi xuống! Cẩn thận tốc độ tăng dần đấy!</p>
+    <button class="play-btn" onclick="window.location.href='Pianogame/piano.html'">Chơi ngay</button>
+  </div>
+
+  <!-- Game 5: Odd One Out -->
+  <div class="game-box">
+    <img src="../images/oddoneout.png" alt="Odd One Out" class="game-img">
+    <h2>Odd One Out</h2>
+    <p>Hãy tìm ra hình ảnh khác biệt so với phần còn lại. Kiểm tra khả năng quan sát của bạn!</p>
+    <button class="play-btn" onclick="window.location.href='Oddoneoutgame/oddoneout.html'">Chơi ngay</button>
+  </div>
+  </div>
+
+    <!-- Game 6: Skibidi clicker -->
+    <div class="game-box">
+      <img src="../images/oddoneout.png" alt="Skbidi clicker" class="game-img">
+      <h2>Skibidi Clicker simulator</h2>
+      <p>...!</p>
+      <button class="play-btn" onclick="window.location.href='skibidiclicker/toilet.html'">Chơi ngay</button>
+    </div>
+    </div>
+  
+</body>
+</html>

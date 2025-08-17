@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>feedback</title>
+
+<style>
+    h2 {
+    font-family: "vpshanoi", sans-serif;
+    font-weight: bold;
+    }
+    p {
+        font-family: "vpshanoi", sans-serif;
+        font-weight: bold;
+    }
+    .feedback-container{
+        text-align: center;
+        margin-top: 50px;
+    }
+    .feedback-btn {
+        padding: 10px 20px;
+        font-size: 16px;
+        color: white;
+        background-color: orangered;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+    .feedback-btn:hover {
+        background-color: red;
+        transform: scale(1.1);
+    }
+    .email-input {
+        width: 40%;
+        padding: 10px;
+        font-size: 16px;
+        border: 3px solid #333;
+        border-radius: 5px;
+        margin-top: 20px;
+    }
+</style>
+</head>
+<body>
+<div class="feedback-container">
+    <h2>Phản hồi & Góp ý</h2>
+    <p>Vui lòng đẻ lại góp ý của bạn bằng Gmail về trường FPT Polytechnic</p>
+    <input type="email" id="email" class="email-input" placeholder="Nhập gmail của bạn">
+    <br>
+    <button class="feedback-btn" onclick="sendFeedback()">Gửi góp ý kiến qua Gmail</button>
+</div>
+
+<script>
+    function sendFeedback() {
+        let email = document.getElementById("email").value;
+        if (email === "") {
+            alert("Vui lòng nhập Gmail của bạn!");
+            return;
+        }
+        let subject = "Góp ý về trường FPT Polytechnic!";
+        let body = "Nhập nội dung góp ý của bạn tại đây...";
+        window.location.href = "mailto:support@fpt.edu.vn?subject=Góp ý về trường FPT Polytechnic&body=Nhập nội dung góp ý của bạn tại đây...";
+    }
+</script>
+</body>
+</html>

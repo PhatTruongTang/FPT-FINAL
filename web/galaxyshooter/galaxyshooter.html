@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Neon Shooter — Local Co-op</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="ui"></div>
+<div id="credits">Neon Shooter • P pause • R restart • 2 players local</div>
+<div id="hud-players"></div>
+
+<!-- Menu -->
+<div id="menu">
+  <div class="card" id="menuCard">
+    <h1 style="margin:0 0 6px 0; font-size:28px; color:#9ff;">Neon Shooter — Local Co-op</h1>
+    <div class="muted">Play with a friend on the same keyboard</div>
+
+    <div style="margin-top:12px; text-align:left;">
+      <div style="font-weight:700; color:#cfe;">Choose Ship Skins</div>
+      <div class="row" style="margin-top:8px;">
+        <div class="skin-swatch sel" id="skin_0" style="background:linear-gradient(90deg,#1ef,#8af);" data-skin="0"></div>
+        <div class="skin-swatch" id="skin_1" style="background:linear-gradient(90deg,#ff7b7b,#ffdd66);" data-skin="1"></div>
+        <div class="skin-swatch" id="skin_2" style="background:linear-gradient(90deg,#a7f,#4ff);" data-skin="2"></div>
+        <div class="skin-swatch" id="skin_3" style="background:linear-gradient(90deg,#7fffcf,#5fc);" data-skin="3"></div>
+      </div>
+
+      <div style="margin-top:12px; font-weight:700; color:#cfe;">Choose Map</div>
+      <div class="row">
+        <img class="map-thumb sel" id="map_0" src="" data-map="0" alt="Map 0" style="background:linear-gradient(180deg,#05010a,#090010);">
+        <img class="map-thumb" id="map_1" src="" data-map="1" alt="Map 1" style="background:linear-gradient(180deg,#0a050a,#150018);">
+        <img class="map-thumb" id="map_2" src="" data-map="2" alt="Map 2" style="background:linear-gradient(180deg,#001a2e,#002b46);">
+      </div>
+
+      <div class="small">Controls — Player 1: WASD + Mouse + Click. Player 2: Arrow keys + IJKL aim + M shoot.</div>
+      <div class="small">To start: Press <strong>Start Game</strong>.</div>
+    </div>
+
+    <div class="row" style="margin-top:14px;">
+      <button id="startBtn" class="sel">Start Game</button>
+      <button id="restartBtn">Restart</button>
+      <button id="tutorialBtn">Tutorial</button>
+    </div>
+  </div>
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>
