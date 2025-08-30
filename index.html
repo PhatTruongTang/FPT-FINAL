@@ -95,6 +95,7 @@
     </div>
     <div class="footer-bottom">
         <p>Powered by <strong>FPT</strong></p>
+        <p id="visit-counter">Đang tải lượt truy cập...</p>
     </div>
 </footer>
 
@@ -117,6 +118,18 @@
 
     setInterval(updateTime, 1000);
     updateTime();
+
+    // Đếm lượt truy cập bằng CountAPI
+    fetch("https://api.countapi.xyz/hit/truong-fpoly-website/visits")
+        .then(res => res.json())
+        .then(res => {
+            document.getElementById("visit-counter").textContent =
+                `👀 Tổng lượt truy cập: ${res.value}`;
+        })
+        .catch(() => {
+            document.getElementById("visit-counter").textContent =
+                "⚠️ Không thể tải số lượt truy cập.";
+        });
 </script>
 
 </body>
