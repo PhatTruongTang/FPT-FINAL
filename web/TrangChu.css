@@ -264,7 +264,7 @@ header .logo img {
 
 .info-container:hover {
   background-image: url('https://caodang.fpt.edu.vn/wp-content/uploads/image004-39.jpg');
-  background-image: url('../images/gman2.webp');
+  background-image: url('https://cdn1.tuoitre.vn/thumb_w/1200/471584752817336320/2023/4/27/fpt1-16825877734451677906524-257-0-1304-2000-crop-16825877941001947209179.jpg');
   filter: brightness(1.2) contrast(1.1);
   transform: scale(1.05);
 }
