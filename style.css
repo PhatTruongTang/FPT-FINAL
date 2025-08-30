@@ -1,3 +1,14 @@
+@font-face {
+    font-family: 'Quicksand';
+    src: url('fonts/Quicksand/static/Quicksand-Bold.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+  }
+  
+  body {
+    font-family: 'Quicksand', sans-serif;
+  }
+  
 iframe[name=page]{
     width: 100%;
     min-height: 400px;
@@ -34,7 +45,7 @@ nav {
 }
 
 body {
-    font-family: "Poppins", sans-serif;
+    font-family: "Quicksand", sans-serif;
     background-color: white;
     font-size: 20px;
     text-align: center;
@@ -130,13 +141,13 @@ h2 {
 /* Chỉ áp dụng animation cho h2 */
 
 p {
-    font-family: "VHAN", sans-serif;
+    font-family: "Quicksand", sans-serif;
     font-weight: normal;
     white-space: pre-line;
 
 }
 h3 {
-    font-family: "VHAN", sans-serif;
+    font-family: "Quicksand", sans-serif;
     font-weight: normal;
 }
 h1 {
