@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login / Register — Demo</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Ionicons -->
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js" defer></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js" defer></script>
+</head>
+<body>
+
+  <!-- TOP VERTICAL SLIDER (outside the login panel) -->
+<div class="top-carousel" id="topCarousel" aria-hidden="true">
+  <div class="top-carousel-track" id="topCarouselTrack">
+    <!-- Thay src bằng ảnh của bạn -->
+    <div class="top-slide"><img src="https://caodang.fpt.edu.vn/wp-content/uploads/thumbnail_Banner-Web.png" alt="Banner 1"></div>
+    <div class="top-slide"><img src="https://mir-s3-cdn-cf.behance.net/project_modules/fs/35dca8145889233.62a6f234ef36f.png" alt="Banner 2"></div>
+    <div class="top-slide"><img src="https://mir-s3-cdn-cf.behance.net/project_modules/1400/38c42a202268247.66836b1d519fa.jpg" alt="Banner 3"></div>
+    <div class="top-slide"><img src="https://channel.mediacdn.vn/428462621602512896/2023/4/20/photo-1-168195829062572524021.jpg" alt="Banner 4"></div>
+    <div class="top-slide"><img src="https://polyschool.fpt.edu.vn/wp-content/uploads/LDP-2000-x-947.png" alt="Banner 5"></div>
+    <div class="top-slide"><img src="https://caodang.fpt.edu.vn/wp-content/uploads/CoverWebsite.png" alt="Banner 6"></div>
+    <div class="top-slide"><img src="https://caodang.fpt.edu.vn/wp-content/uploads/2024/01/1200x628-copy-scaled.jpg" alt="Banner 7"></div>
+    <div class="top-slide"><img src="https://btec.fpt.edu.vn/wp-content/uploads/2023/06/SEO-thumbnail-2.png" alt="Banner 8"></div>
+    <div class="top-slide"><img src="https://vuakhuyenmai.vn/wp-content/uploads/fptshop-khuyen-mai-moi-19-7-2021.jpg" alt="Banner 9"></div>
+    <div class="top-slide"><img src="https://fpt.vn/storage/upload/images/banners/linh/2048x560_ctkm-11-2023.jpg" alt="Banner 10"></div>
+    <div class="top-slide"><img src="https://caodang.fpt.edu.vn/wp-content/uploads/1200x600-4.png" alt="Banner 11"></div>
+    <div class="top-slide"><img src="https://caodang.fpt.edu.vn/wp-content/uploads/2024/07/HN_900x600-banner-tat-ca-cac-nganh-hoc.webp" alt="Banner 12"></div>
+    <div class="top-slide"><img src="https://caodang.fpt.edu.vn/wp-content/uploads/2025/08/Tong-hop-cac-truong-dao-tao-nganh-Duoc-khu-vuc-mien-Bac-XET-HOC-BA-1536x1024.png" alt="Banner 13"></div>
+    <div class="top-slide"><img src="https://caodang.fpt.edu.vn/wp-content/uploads/2025/08/So-sanh-co-hoi-nghe-nghiep-giua-lap-trinh-web-va-lap-trinh-mobile-1-1024x683.png" alt="Banner 14"></div>
+    <div class="top-slide"><img src="https://caodang.fpt.edu.vn/wp-content/uploads/2025/08/Nganh-Duoc-la-gi_-Co-hoi-nghe-nghiep-cho-nguoi-hoc-nganh-Duoc-tai-FPT-Polytehnic-2048x1365.png" alt="Banner 15"></div>
+    <div class="top-slide"><img src="https://caodang.fpt.edu.vn/wp-content/uploads/2025/08/20250806-Concept-1-900x600-1-1.png" alt="Banner 16"></div>
+    <div class="top-slide"><img src="https://thumbs.dreamstime.com/z/set-furious-horror-bees-set-furious-horror-bees-generative-ai-illustration-293063901.jpg" alt="Banner 17"></div>
+  </div>
+
+  <button class="carousel-btn up" id="carouselPrev" aria-label="Previous slide">
+    <ion-icon name="chevron-up-outline"></ion-icon>
+  </button>
+  <button class="carousel-btn down" id="carouselNext" aria-label="Next slide">
+    <ion-icon name="chevron-down-outline"></ion-icon>
+  </button>
+</div>
+
+  <!-- Background cover layer (image) -->
+  <div class="bg-cover" aria-hidden="true"></div>
+
+  <div class="wrapper show-login" id="authWrapper" aria-live="polite">
+    <div class="slider"><!-- slider: 3 panels horizontally -->
+
+      <!-- LOGIN PANEL -->
+      <section class="panel login" aria-label="Login panel">
+        <div class="brand" style="align-items:center;">
+          <div class="logo-dot" aria-hidden="true"></div>
+          <div class="brand-title">Welcome back</div>
+          <div class="ghost" aria-hidden="true">Secure</div>
+          <div id="userStatus" style="margin-left:auto;font-size:13px;color:var(--muted)"></div>
+        </div>
+
+        <h3 class="head">Login</h3>
+
+        <form class="form" id="loginForm" autocomplete="on" novalidate>
+          <div class="input-box">
+            <input id="loginEmail" type="email" name="email" required placeholder=" " />
+            <label for="loginEmail">Email</label>
+            <span class="icon" aria-hidden="true"><ion-icon name="mail-outline"></ion-icon></span>
+          </div>
+
+          <div class="input-box">
+            <input id="loginPassword" type="password" name="password" required placeholder=" " />
+            <label for="loginPassword">Password</label>
+            <span class="icon toggle-pw" data-target="loginPassword" title="Show/Hide password" role="button">
+              <ion-icon name="eye-off-outline"></ion-icon>
+            </span>
+          </div>
+
+          <div id="loginError" class="error" style="display:none"></div>
+
+          <div class="row-between">
+            <label class="checkbox"><input id="rememberMe" type="checkbox" /> Remember me</label>
+            <a class="small-link" href="#" id="forgotLink">Forgot?</a>
+          </div>
+
+          <button class="btn" id="loginBtn" type="submit">Login</button>
+
+          <div class="note">Don't have an account? <a href="#" class="small-link" id="toRegister">Register</a></div>
+        </form>
+      </section>
+
+      <!-- REGISTER PANEL -->
+      <section class="panel register" aria-label="Registration panel">
+        <div class="brand">
+          <div class="logo-dot" aria-hidden="true"></div>
+          <div class="brand-title">Create account</div>
+          <div class="ghost" aria-hidden="true">Free</div>
+        </div>
+
+        <h3 class="head">Registration</h3>
+
+        <form class="form" id="registerForm" autocomplete="on" novalidate>
+          <div class="input-box">
+            <input id="regName" type="text" name="name" required placeholder=" " />
+            <label for="regName">Full name</label>
+            <span class="icon"><ion-icon name="person-outline"></ion-icon></span>
+          </div>
+
+          <div class="input-box">
+            <input id="regEmail" type="email" name="email" required placeholder=" " />
+            <label for="regEmail">Email</label>
+            <span class="icon"><ion-icon name="mail-outline"></ion-icon></span>
+          </div>
+
+          <div class="input-box">
+            <input id="regPassword" type="password" name="password" required placeholder=" " />
+            <label for="regPassword">Password</label>
+            <span class="icon toggle-pw" data-target="regPassword" title="Show/Hide password">
+              <ion-icon name="eye-off-outline"></ion-icon>
+            </span>
+          </div>
+
+          <div id="regError" class="error" style="display:none"></div>
+
+          <div class="row-between">
+            <label class="checkbox"><input id="agreeTos" type="checkbox" required /> I agree to the terms</label>
+          </div>
+
+          <button class="btn" id="registerBtn" type="submit">Register</button>
+
+          <div class="note">Already have an account? <a href="#" class="small-link" id="toLogin">Login</a></div>
+        </form>
+      </section>
+
+      <!-- FORGOT / RESET PANEL -->
+      <section class="panel forgot" aria-label="Reset panel">
+        <div class="brand">
+          <div class="logo-dot" aria-hidden="true"></div>
+          <div class="brand-title">Change password</div>
+          <div class="ghost" aria-hidden="true">Secure</div>
+        </div>
+
+        <h3 class="head">Reset Password</h3>
+
+        <form class="form" id="forgotForm" autocomplete="on" novalidate>
+          <div class="input-box">
+            <input id="forgotEmail" type="email" required placeholder=" " />
+            <label for="forgotEmail">Email</label>
+            <span class="icon"><ion-icon name="mail-outline"></ion-icon></span>
+          </div>
+
+          <button class="btn" id="sendOtpBtn" type="submit">Send OTP</button>
+
+          <div id="otpBox" style="display:none; margin-top:10px;">
+            <div class="input-box">
+              <input id="otpCode" type="text" required placeholder=" " />
+              <label for="otpCode">OTP Code</label>
+            </div>
+            <div class="input-box">
+              <input id="newPassword" type="password" required placeholder=" " />
+              <label for="newPassword">New Password</label>
+              <span class="icon toggle-pw" data-target="newPassword"><ion-icon name="eye-off-outline"></ion-icon></span>
+            </div>
+
+            <button class="btn" id="resetBtn" type="button">Reset Password</button>
+          </div>
+
+          <div class="note"><a href="#" id="backToLogin" class="small-link">Back to Login</a></div>
+        </form>
+      </section>
+
+    </div><!-- /.slider -->
+  </div><!-- /.wrapper -->
+  
+  <!-- In-page modal (notification / confirm) -->
+  <div id="appModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1">
+      <div class="modal-inner">
+        <h3 id="modalTitle" class="modal-title"></h3>
+        <div class="modal-body"></div>
+        <div class="modal-actions" role="group" aria-label="Modal actions"></div>
+        <button class="modal-close" aria-label="Close modal">&times;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS (separate file) -->
+  <script src="script.js" defer></script>
+</body>
+</html>

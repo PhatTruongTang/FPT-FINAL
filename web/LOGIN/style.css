@@ -1,0 +1,276 @@
+:root {
+  --card-w: 820px;
+  --card-h: 560px;
+  --accent: #162938;
+  --accent-2: #0f3550;
+  --muted: #5b6b78;
+  --radius: 14px;
+  --form-gap: 16px;
+  --input-height: 56px;
+  --panel-bg: rgba(255, 255, 255, 0.12);
+  --panel-blur: 14px;
+  --wrapper-overlay: rgba(255, 255, 255, 0.02);
+  --ease: cubic-bezier(.2, .9, .3, 1);
+  --login-enter-duration: 1800ms;
+  --top-carousel-h: 160px;    /* chiều cao mặc định của carousel */
+}
+
+@media (max-width:900px) {
+  :root {
+    --card-h: 720px;
+    --form-gap: 14px;
+    --input-height: 56px;
+    --top-carousel-h: 110px;
+  }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Reset + body */
+* { box-sizing: border-box; margin: 0; padding: 0 }
+html, body { height: 100% }
+
+body {
+  font-family: Inter, "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  color: #0f2340;
+  background:
+    radial-gradient(1200px 400px at 10% 20%, rgba(255, 160, 60, 0.06), transparent 8%),
+    radial-gradient(900px 300px at 90% 80%, rgba(50, 150, 255, 0.05), transparent 8%),
+    linear-gradient(180deg, #bfe9ff 0%, #eaf7ff 100%);
+}
+
+/* ---------- BG COVER (stretch fill giống slider quảng cáo) ---------- */
+.bg-cover {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: none; /* JS sẽ dùng <img> thay thế; giữ overlay bằng ::after */
+  transition: filter .35s var(--ease), opacity .35s var(--ease);
+  pointer-events: none;
+}
+
+/* overlay như cũ */
+.bg-cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
+  pointer-events: none;
+}
+
+/* hình nền thực tế (JS sẽ chèn <img class="bg-img">) */
+.bg-cover img.bg-img{
+  position: fixed;          /* cố định theo viewport */
+  top: 0;
+  left: 0;
+  width: 100vw;             /* luôn phủ toàn bộ viewport ngang */
+  height: 100vh;            /* luôn phủ toàn bộ viewport dọc */
+  min-width: 100%;
+  min-height: 100%;
+  object-fit: fill;         /* <-- KÉO GIÃN để lấp kín khung (méo tỉ lệ giống slider) */
+  object-position: center center;
+  transform-origin: center center;
+  transition: transform 320ms cubic-bezier(.2,.9,.3,1), opacity 180ms ease;
+  will-change: transform, width, height;
+  -webkit-user-drag: none;
+  user-select: none;
+  display: block;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Fallback: nếu JS fail, giới hạn tối đa chiều cao */
+.top-carousel { max-height: 420px; }
+
+
+/* Card / wrapper */
+.wrapper {
+  width: min(var(--card-w), 96vw);
+  height: var(--card-h);
+  border-radius: var(--radius);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 22px 60px rgba(2, 6, 23, 0.28);
+  transition: height .36s var(--ease), width .28s var(--ease), transform .28s var(--ease);
+  background: transparent;
+  margin-top: calc(var(--top-carousel-h) + 12px);
+}
+
+.wrapper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--wrapper-overlay), rgba(255, 255, 255, 0.02));
+  pointer-events: none;
+  z-index: 0
+}
+
+.wrapper.animating { box-shadow: 0 30px 80px rgba(2, 6, 23, 0.32) }
+
+/* Slider & panels */
+.slider {
+  position: relative;
+  z-index: 1;
+  width: 300%;
+  height: 100%;
+  display: flex;
+  transition: transform .45s var(--ease);
+  transform: translateX(0)
+}
+
+.panel {
+  width: calc(100%/3);
+  padding: 42px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--panel-bg);
+  border-radius: 10px;
+  backdrop-filter: blur(var(--panel-blur)) saturate(110%);
+  -webkit-backdrop-filter: blur(var(--panel-blur)) saturate(110%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 10px 36px rgba(2, 10, 30, 0.10);
+  transition: padding .22s var(--ease);
+}
+
+/* Brand, headings, inputs, buttons (concise) */
+.brand { display:flex; align-items:center; gap:10px; margin-bottom:8px; position:relative }
+.logo-dot { width:10px; height:10px; border-radius:50%; background:linear-gradient(45deg,#ff8a00,#ff3d81); box-shadow:0 3px 10px rgba(255,60,100,0.18) }
+.brand-title { font-weight:700; color:var(--accent-2) }
+.ghost { position:absolute; right:36px; top:12px; color:var(--muted); font-size:13px }
+.head { font-size:clamp(20px,2.4vw,30px); font-weight:700; color:var(--accent-2); margin-bottom:12px }
+.form { display:flex; flex-direction:column; gap:var(--form-gap); margin-top:6px }
+.input-box { position:relative; width:100%; border-bottom:2px solid rgba(22,41,56,0.10); padding:8px 44px 8px 6px; height:var(--input-height); display:flex; align-items:center; margin:5px 0 }
+.input-box input { width:100%; border:0; background:transparent; outline:none; padding:10px 6px 6px 0; font-size:15px; color:var(--accent-2) }
+.input-box label { position:absolute; left:6px; top:50%; transform:translateY(-50%); font-size:15px; color:var(--muted); pointer-events:none; transition:all .18s ease }
+.input-box input:focus+label, .input-box input:not(:placeholder-shown)+label { top:-10px; font-size:12px; color:var(--accent) }
+.input-box .icon { position:absolute; right:10px; font-size:18px; color:var(--muted); display:flex; align-items:center }
+.toggle-pw { cursor:pointer }
+.row-between { display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:14px; color:var(--muted); margin-top:4px }
+.checkbox { display:flex; align-items:center; gap:8px; color:var(--muted); font-size:13px }
+.btn { margin-top:6px; padding:12px 18px; border-radius:10px; border:0; background:linear-gradient(180deg,var(--accent),var(--accent-2)); color:#fff; font-weight:700; cursor:pointer; box-shadow:0 8px 24px rgba(15,35,60,0.18); transition: transform .12s ease }
+.btn:hover { transform:translateY(-3px); box-shadow:0 18px 40px rgba(15,35,60,0.18) }
+.small-link { color:var(--accent-2); font-weight:600; text-decoration:none }
+.note { margin-top:12px; font-size:14px; color:var(--muted); text-align:center }
+.error { color:#b23; font-size:13px }
+
+/* Slider positions toggled by JS */
+.wrapper.show-login .slider { transform: translateX(0) }
+.wrapper.show-register .slider { transform: translateX(-33.3333%) }
+.wrapper.show-forgot .slider { transform: translateX(-66.6666%) }
+
+/* Responsive */
+@media (max-width:899px) {
+  .wrapper { width: min(420px,96vw); height:auto; border-radius:12px }
+  .panel { padding:20px; width:100%; border-radius:10px }
+  .ghost { position:static; margin-left:auto; padding-left:6px; margin-top:6px }
+}
+
+/* Modal */
+.modal-overlay{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(10,12,16,0.42); z-index:12000; opacity:0; pointer-events:none; transition:opacity .18s var(--ease) }
+.modal-overlay.show{ opacity:1; pointer-events:auto }
+.modal{ transform:translateY(6px) scale(.96); transition:transform .22s var(--ease), opacity .18s var(--ease); opacity:0 }
+.modal-overlay.show .modal{ transform:translateY(0) scale(1); opacity:1 }
+.modal-inner{ background:#fff; min-width:280px; max-width:520px; width:min(92vw,520px); border-radius:12px; padding:18px; box-shadow:0 18px 50px rgba(2,8,30,0.48); position:relative }
+.modal-title{ font-size:18px; color:#0f3550; font-weight:700; margin:0 0 8px }
+.modal-body{ font-size:14px; color:#31495a; margin-bottom:14px; line-height:1.45 }
+.modal-actions{ display:flex; gap:14px; justify-content:center; margin-top:6px }
+.modal-actions .modal-btn{ flex:1; min-width:120px; padding:12px 18px; border-radius:10px; font-weight:700 }
+.modal-actions .modal-btn.primary{ background:linear-gradient(180deg,#0f3550,#162938); color:#fff }
+.modal-actions .modal-btn.ghost{ background:linear-gradient(180deg,#fff,#fbfdfe); color:var(--accent-2); border:1px solid rgba(20,40,60,0.08) }
+.modal-close{ position:absolute; right:10px; top:8px; border:0; background:transparent; font-size:20px; color:rgba(20,40,60,0.6); cursor:pointer; padding:6px; border-radius:6px }
+
+/* Entrance animation for login panel */
+.wrapper.show-login .panel.login { transform-origin: top center; will-change: transform, opacity; animation: login-enter var(--login-enter-duration) var(--ease) both; z-index:2 }
+@keyframes login-enter { 0%{ transform:translateY(-108px) scale(.8); opacity:0 } 45%{ transform:translateY(10px) scale(1.05); opacity:1 } 100%{ transform:translateY(0) scale(1); opacity:1 } }
+.wrapper.show-login .panel.login .brand, .wrapper.show-login .panel.login .head, .wrapper.show-login .panel.login .form { opacity:1; transform:translateY(0); transition: transform 520ms var(--ease), opacity 520ms var(--ease); transition-delay:900ms }
+
+/* ========== Top vertical carousel (stretched fill, no crop) ========== */
+.top-carousel{
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1400px, 96vw);
+  height: var(--top-carousel-h);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(2,6,23,0.14);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  z-index: 11999;
+  display:block;
+  pointer-events: auto;
+  transition: transform 200ms ease, width 220ms ease, height 260ms cubic-bezier(.2,.9,.3,1);
+}
+
+/* track / slides */
+.top-carousel-track{ height:100%; display:flex; flex-direction:column; transition: transform 700ms cubic-bezier(.2,.9,.3,1); will-change: transform; }
+.top-slide{ width:100%; height:100%; flex:0 0 100%; overflow:hidden; display:flex; align-items:center; justify-content:center; background: transparent; }
+
+/* Top-carousel images: stretch fill để giống banner (có thể méo) */
+.top-slide img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit: fill;        /* Kéo giãn full */
+  object-position: center center;
+  transition: transform 180ms ease;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* buttons: responsive size + scale on hover/focus */
+.carousel-btn{
+  position:absolute;
+  right:14px;
+  width:clamp(36px, 9vw, 48px);
+  height:clamp(36px, 9vw, 48px);
+  border-radius:50%;
+  border:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: rgba(255,255,255,0.92);
+  cursor:pointer;
+  box-shadow:0 6px 18px rgba(2,8,30,0.12);
+  z-index:12000;
+  transition: transform 180ms ease, opacity 160ms ease, box-shadow 160ms ease;
+}
+.carousel-btn.up{ top:16px; }
+.carousel-btn.down{ bottom:16px; }
+.carousel-btn:hover, .carousel-btn:focus{ transform: translateY(-4px) scale(1.06); box-shadow:0 14px 34px rgba(2,8,30,0.18); }
+
+.top-carousel.compact .carousel-btn{ width:clamp(30px,7.5vw,40px); height:clamp(30px,7.5vw,40px); opacity:0.95; right:10px; }
+
+/* subtle feedback when resizing */
+.top-carousel.resizing{ transform: translateX(-50%) scale(0.992); transition: transform 180ms ease; }
+
+/* responsive tweak */
+@media (max-width:900px){
+  .top-carousel{ height: var(--top-carousel-h); width:96vw; left:50%; transform:translateX(-50%); top:18px; }
+}
+
+/* CSS fallback: không để carousel quá cao */
+.top-carousel {
+  max-height: 420px; /* giới hạn tối đa toàn cục (thay nếu cần) */
+}
+
+/* cho mobile (nếu muốn, đảm bảo không quá cao) */
+@media (max-width:420px){
+  .top-carousel { max-height: 380px; }
+}
