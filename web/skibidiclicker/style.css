@@ -56,6 +56,27 @@ body {
     animation: floatUp 1s ease-out forwards;
 }
 
+/* nút reset data góc phải dưới */
+.reset-btn{
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 9999;
+    background: rgba(220,20,60,0.95); /* đỏ nhẹ */
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    transition: transform .08s ease, opacity .12s ease;
+    opacity: 0.95;
+}
+.reset-btn:hover{ transform: translateY(-2px) scale(1.03); opacity: 1; }
+.reset-btn:active{ transform: translateY(0) scale(0.98); }
+
+
 @keyframes floatUp {
     0% {opacity: 1; transform: translateY(0);}
     100% {opacity: 0; transform: translateY(-80px);}
